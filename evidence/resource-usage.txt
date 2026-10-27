@@ -1,0 +1,17 @@
+## measured 2026-10-27 22:22:08 KST
+backend:
+  pid=1494 rss=286MB cpu=0.1% etime=09:29
+clickhouse nodes:
+  a1 rss=18MB cpu=0.0%
+  a2 rss=100MB cpu=0.0%
+  b1 rss=17MB cpu=0.0%
+disk:
+   29M	var/app
+   25M	var/app/chdb
+   25M	var/testenv
+  583M	.venv
+  851M	.tools
+free:
+  avail=11Gi
+cluster-B (plain) [{'node_id': 'n2d1a6b3ba106', 'collect_path': 'backfill', 'raw_rows': 24, 'distinct_events': 24}, {'node_id': 'n2d1a6b3ba106', 'collect_path': 'rmv', 'raw_rows': 20, 'distinct_events': 12}]
+cluster-A (TLS) [{'node_id': 'n79945e956cbd', 'collect_path': 'backfill', 'raw_rows': 18, 'distinct_events': 18}, {'node_id': 'n79945e956cbd', 'collect_path': 'rmv', 'raw_rows': 8, 'distinct_events': 8}, {'node_id': 'na976f56792d5', 'collect_path': 'backfill', 'raw_rows': 28, 'distinct_events': 28}, {'node_id': 'na976f56792d5', 'collect_path': 'rmv', 'raw_rows': 8, 'distinct_events': 8}]

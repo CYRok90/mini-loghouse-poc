@@ -10,6 +10,9 @@ States per (node, source):
 Coverage cursor for query_log (per node):
   An RMV refresh that succeeded at second S read [S+1-lag-W, S-lag) at least
   (S has 1 s precision in system.view_refreshes; now() is evaluated in [S, S+1)).
+  Measured: last_success_time is the refresh START (floored), last_refresh_time
+  the end (evidence/phase_a2/view_refreshes_time_semantics.log), so S - lag never
+  overstates what was read.
   Consecutive successes are contiguous while their windows overlap; otherwise
   the hole becomes a gap that the supervisor backfills explicitly.
   The cursor is NOT max(event_time): it is the end of a window that was fully

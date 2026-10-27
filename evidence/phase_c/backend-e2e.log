@@ -116,3 +116,6 @@ INFO:     127.0.0.1:54660 - "GET /static/add.js?v=4 HTTP/1.1" 304 Not Modified
 INFO:     127.0.0.1:54660 - "POST /api/probe HTTP/1.1" 200 OK
 2026-10-27 22:19:46,342 INFO mlh.supervisor: node n79945e956cbd gap pending [1793107117, 1793107158) collection_interrupted
 INFO:     127.0.0.1:54660 - "POST /api/clusters HTTP/1.1" 409 Conflict
+INFO:     127.0.0.1:54846 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54847 - "GET /api/clusters/ceb26d8253e22/diagnostics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54848 - "GET /api/clusters/c17d44ea61b79/diagnostics HTTP/1.1" 200 OK
