@@ -1,0 +1,31 @@
+## plain 18:34:13
+inline mv create (unreachable source): ERR ChdbError: Code: 519. DB::NetException: All attempts to get table structure failed. Log:  leak= False
+nc create: OK 
+system.tables create_table_query: []
+named_collections: OK "nc_plain","{'host':'[HIDDEN]','password':'[HIDDEN]','port':'[HIDDEN]','user':'[HIDDEN]'}"
+
+view_refreshes: []
+plaintext marks on disk: {'SECRET_INLINE_456': [], 'SECRET_NCPLAIN_123': ['named_collections/nc_plain.sql']}
+## enc 18:34:16
+nc create: OK 
+mv create: ERR ChdbError: Code: 519. DB::NetException: All attempts to get table structure failed. Log: 
+system.tables create_table_query: []
+named_collections: OK "nc_enc","{'host':'[HIDDEN]','password':'[HIDDEN]','port':'[HIDDEN]','user':'[HIDDEN]'}"
+
+view_refreshes: []
+plaintext marks on disk: {'SECRET_NCENC_789': []}
+files: ['named_collections', 'named_collections/nc_enc.sql']
+## reopen with key
+key present in env: True
+named_collections: OK "nc_enc"
+
+mv still defined: OK 
+view_refreshes: OK 
+## reopen with WRONG key
+Code: 62. DB::Exception: Unrecognized token: Syntax error (in file nc_enc.sql): failed at position 1 (µ): µDÐìÇÔR;. . (SYNTAX_ERROR)
+key present in env: True
+open failed: RuntimeError Failed to create connection: Code: 36. DB::Exception: Error initializing EmbeddedServer: . (BAD_ARGUMENTS)
+## reopen WITHOUT key
+Code: 36. DB::Exception: Encryption key must not be empty. (BAD_ARGUMENTS)
+key present in env: False
+open failed: RuntimeError Failed to create connection: Code: 36. DB::Exception: Error initializing EmbeddedServer: . (BAD_ARGUMENTS)

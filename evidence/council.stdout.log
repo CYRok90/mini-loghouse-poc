@@ -1,0 +1,237 @@
+[Council] 세션: /tmp/council/20261027_183726_70098
+
+╔══════════════════════════════════════════╗
+║   LLM Council v2 - 멀티라운드 디베이트    ║
+╚══════════════════════════════════════════╝
+
+[Council] 주제: # Council brief — chDB Mini LogHouse 웹 PoC 구현 설계 검토
+
+각 참여자는 **자신의 의견만** 작성하라. 다른 참여자 발언이나 가상 토론 라운드를 재연하지 마라.
+목표: 아래 설계 초안의 결함(정확성·장애복구·보안·과잉설계)을 찾아 구체적 수정안을 제시. 각 지적은 "문제 → 실패 시나리오 → 수정안" 형식.
+
+## 요구 (요약)
+단일 운영자 로컬(loopback) 웹앱. 사용자가 웹에서 ClickHouse 클러스터 endpoint/TLS/user/password 등록 → 연결·권한 검사 → 저장·수집 시작 → 목록에서 상태(준비 중/첫 수집 대기/수집 중/수집 지연/수집 오류, 마지막 성공 시각, 노드 커버리지 전체/일부/미확인) → 상세 Dashboard(현재 metric+시계열, 기간 쿼리 수/실패 수, p95, 시간대별 추이, 최근/느린/오류 쿼리 테이블; 기간 15m/1h/24h, 노드 필터). 수집 원안은 **앱 내 chDB + Refreshable MV(RMV) + remote()/remoteSecure()**. source는 system.metrics(snapshot APPEND), system.query_log(구간·중복·지연·재시작 복구 관리)만. Dashboard는 chDB 저장 데이터만 조회. 브라우저가 닫혀도 backend가 살아 있으면 수집 지속. password는 URL/localStorage/API 응답/로그 노출 금지, 재시작 후 보존 시 암호화+키 분리. 테스트 topology: 로컬 ClickHouse A(2노드) + B(1노드).
+
+## 실측된 사실 (이 머신, 2026-10-27)
+- macOS 27 arm64, chdb 4.4.0 / chdb-core 26.9.0 / engine 26.9.2.1 (Mach-O strtab 정렬 패치 후 import 가능). 테스트 서버는 ClickHouse 26.8 LTS 예정.
+- 영속 Session에서 `REFRESH EVERY 5 SECOND APPEND TO` RMV: SQL 없는 유휴 22초 동안 5초 경계 refresh 4회. 프로세스 15초 완전 종료 동안 0회, 재오픈 시 즉시 1회 + 이후 주기 반복. 데이터/정의 보존. ⇒ RMV는 상주 프로세스 수명 동안만 돌고, 다운타임 backfill 없음.
+- remote() source RMV는 CREATE 시 원격 구조를 조회 → source 불가 시 생성 실패(519).
+- 오류코드: 거부 210, connect timeout 209, DNS 198 (외곽 519/279로 감싸짐). 기본 3회 재시도. 메시지에 password 미포함.
+- 기본 named collection(NC)은 `<path>/named_collections/*.sql`에 password 평문. `?config-file=` 로 `named_collections_storage type=local_encrypted, key_hex from_env` 지정 시 암호화 저장, 재시작 후 로드됨. 키 없음/틀림이면 chDB 전체 open 실패.
+- query parameter `{name:Type}` 바인딩 지원(chdb Session.query params).
+
+## 설계 초안
+1. **스택**: Python 3.11 + FastAPI/uvicorn(단일 worker, reload 금지) + 정적 HTML/vanilla JS(빌드 없음, 차트는 자체 SVG, 외부 CDN 없음). 등록 metadata는 SQLite(stdlib), telemetry는 chDB. 127.0.0.1 bind.
+2. **수명/소유권**: 프로세스당 chDB Session 1개를 `CollectorOwner`가 소유. data dir에 fcntl 배타 lock(두 번째 인스턴스는 즉시 종료). HTTP 요청은 RMV를 생성/재생성하지 않음(등록 시 1회 DDL, 시작 시 reconcile만). 원격 probe(연결 테스트)는 별도 Session 또는 thread에서 timeout·동시성 제한.
+3. **자격증명**: password는 SQLite에 저장하지 않고 chDB NC(local_encrypted)에만 저장. 키는 data dir 밖 `~/.config/mini-loghouse/nc.key`(0600, 최초 생성) 또는 env. RMV DDL은 `remoteSecure(nc_<cid>_<nid>, database='system', table='query_log')`처럼 NC 이름만 참조 → DDL/metadata에 password 없음(서버 확보 후 실측 예정). 연결 테스트 probe는 parameter binding으로 password 전달. 키 분실 시: named_collections 디렉터리 격리 후 재입력 상태로 복구.
+4. **topology**: 등록 endpoint에서 `system.clusters`로 노드 후보 발견 → 각 노드에 같은 계정으로 probe → 성공 노드마다 NC + RMV 생성. 커버리지 = 성공 노드 / 발견 노드 (발견 불가 시 '미확인', endpoint만). 노드별 RMV라 한 노드 장애가 다른 노드 수집을 막지 않음.
+5. **metrics**: 노드별 RMV `REFRESH EVERY 15 SECOND APPEND TO telemetry.metrics_raw AS SELECT '<cid>','<nid>', hostName() AS source_host, now64(3) AS collected_at, metric, value FROM remoteSecure(nc,...system.metrics)`.
+6. **query_log 증분**: 노드별 RMV, 대상 `telemetry.query_log_raw`(ReplacingMergeTree). window: `lo = greatest(watermark - overlap, now() - max_backfill)`, `hi = now() - safety_lag`. watermark는 RMV 내부 scalar subquery로 로컬 테이블에서 `max(event_time)`(해당 node) 읽음(초기화 시 now()-max_backfill). safety_lag 15s(> flush_interval 7.5s), overlap 60s, max_backfill 24h. 원격 스트림 `ORDER BY event_time_microseconds`로 부분 실패 시 prefix만 삽입되도록 함. 행에 window_lo/hi, collected_at 기록. ⇒ 재시작 후 첫 refresh가 다운타임 구간을 자동 backfill(최대 24h).
+   - dedup key: (cluster_id, node_id, event_time_microseconds, query_id, type). QueryStart/Finish는 type으로 구분. 집계는 FINAL 또는 key GROUP BY.
+   - 수집기 자체 쿼리는 `log_comment='mini-loghouse-collector'`로 표시하고 Dashboard 집계에서 제외.
+7. **집계 정의**: 논리 요청 = is_initial_query=1 AND type∈{QueryFinish, ExceptionBeforeStart, ExceptionWhileProcessing}. 노드별 실행 = 모든 노드의 같은 type 집합(is_initial_query 무관). 실패 = Exception* (initial). p95 = QueryFinish initial의 query_duration_ms. QueryStart는 집계 제외.
+8. **상태**: 앱 supervisor가 `system.view_refreshes`를 주기 폴링(로컬 chDB 조회만) → 노드/소스별 last_success, last_exception, next_refresh를 chDB `telemetry.collection_status`에 append(재시작 후 이력 보존). 상태: RMV 생성 전=준비 중, 생성 후 성공 없음=첫 수집 대기, last_success ≤ 3×interval+lag=수집 중, 초과=수집 지연, 최근 refresh exception=수집 오류. 연결/수집/관측 클러스터 상태 분리 표시.
+9. **보안**: 모든 동적 텍스트는 textContent 렌더. POST에 Origin 검사 + double-submit CSRF 토큰. 등록 idempotency key + (host,port,user) unique → 중복 등록 방지. identifier(DB/NC/MV 이름)는 서버 생성 hex만. 사용자 입력(host/port/user)은 정규식·범위 검증 후 리터럴은 parameter binding 또는 검증된 quoting. data dir 0700.
+
+## 검토 요청 질문
+Q1. 6번 watermark(scalar subquery + ORDER BY prefix) 설계가 원격 table function 안에서 실제로 의도대로 동작할 가능성과 실패 시나리오, 더 단순하고 정확한 대안은?
+Q2. DDL이 정적이라 사용자 값(host·NC 이름·cid/nid 리터럴)을 RMV DDL에 넣어야 한다. 안전한 생성 방식은? parameter binding이 DDL에 불가능할 때의 quoting 정책?
+Q3. 2·3번의 소유권/동시성/키 관리에서 빠진 실패 모드?
+Q4. 7번 집계 정의의 오류(분산 쿼리, 재시도, 동일 query_id 재사용 등)?
+Q5. PoC 범위 대비 과잉설계로 빼야 할 것, 반드시 추가해야 할 것?
+[Council] 모드: debate | 라운드: 2 | 합의 임계: 85 | 유예: 0s
+[Council] 에이전트: Claude Codex
+[Council] Claude Code 내부 실행 감지 — Claude CLI를 별도 프로세스로 참여시킵니다
+
+[Council] ━━━ 라운드 1/2: 자유 분석 ━━━
+[Council]   claude 완료 (239s, 3281단어, success)
+[Council]   codex 완료 (173s, 2263단어, success)
+[Council]   결과: 2 성공, 0 실패
+[Council]   [Token] Claude/runtime-default/runtime-default: 입력 2 / 출력 22724 / 캐시 535 / 합계 28844
+[Council]   [Token] Codex/runtime-default/runtime-default: 입력 11295 / 출력 4730 / 캐시 0 / 합계 16025
+
+[Council] ━━━ 라운드 2/2: 교차 리뷰 (활성: 2명) ━━━
+[Council]   claude 완료 (94s, 1426단어, success)
+[Council]   codex 완료 (86s, 1295단어, success)
+[Council]   결과: 2 성공, 0 실패
+[Council]   [Token] Claude/runtime-default/runtime-default: 입력 2 / 출력 8311 / 캐시 2123 / 합계 36553
+[Council]   [Token] Codex/runtime-default/runtime-default: 입력 23881 / 출력 2652 / 캐시 0 / 합계 26533
+
+[Council] ━━━ 최종 종합 (Claude/runtime-default/runtime-default) ━━━
+[Council] 종합 완료
+
+
+╔══════════════════════════════════════════╗
+║            최종 합의안                    ║
+╚══════════════════════════════════════════╝
+
+# chDB Mini LogHouse 설계 검토: 최종 합의안
+
+두 전문가(A: Claude, C: Codex)의 2라운드 토론을 종합했습니다. 라운드 2에서 양측이 상당 부분 수렴했고, 남은 이견은 구현 세부와 복구 정책에 한정됩니다.
+
+---
+
+## 1. 합의된 사항
+
+### 1.1 수집 아키텍처
+- **metrics는 RMV를 유지합니다.** 노드별 `REFRESH EVERY 15 SECOND APPEND`로 수집합니다. 상주 프로세스 동안 주기 실행된다는 효용이 실측으로 확인되었습니다.
+- **query_log는 Python 수집 루프로 옮깁니다.** 원안의 RMV + scalar watermark + `ORDER BY` prefix 방식은 채택하지 않습니다. 이유는 다음과 같습니다.
+  - `max(event_time)`은 "관측한 최대 시각"일 뿐, "그 이전 구간을 빠짐없이 수집했다"는 증거가 아닙니다.
+  - 유휴 노드에서는 watermark가 멈추고, 그 결과 window가 계속 넓어집니다.
+  - ORDER BY 정렬과 실패 원자성은 서로 다른 성질입니다. 부분 삽입이 prefix가 된다는 보장이 없습니다.
+  - scalar subquery가 원격에 전송되는지, 필터가 원격으로 push down되는지 모두 미확인입니다.
+- **A가 제안한 RMV sentinel(UNION ALL) 방식은 A 스스로 철회했습니다.** 분기 간 삽입 순서와 원자성이 보장되지 않기 때문입니다.
+- **query_log RMV가 필수 요구라면** 허용되는 형태는 하나뿐입니다. watermark 없이 매번 고정된 최근 구간을 재조회하고 dedup하며, 긴 다운타임은 별도의 명시적 backfill로 처리합니다.
+
+### 1.2 완료 cursor와 불변식
+- 진행 상태는 데이터와 분리하여 **SQLite의 `committed_hi`**에 둡니다.
+- 커밋 순서는 **원격 조회 완료 → 로컬 저장 성공 → cursor 커밋**입니다. 중간에 실패하면 같은 구간을 재조회하고, 생기는 중복은 dedup으로 수렴합니다.
+- 구간은 **`[lo, hi)` 반열림**으로 표기하고, 비교 타입은 `DateTime64(6)` 하나로 통일합니다.
+- 빈 구간도 성공으로 처리하여 cursor를 전진시킵니다. **"쿼리 0건"과 "수집 못 함"을 구분**하는 것이 이 설계의 핵심입니다.
+- `max_backfill`(24h)을 넘어 복구하지 못한 구간은 `gaps(node, from, to, reason)`에 기록하고, 차트에 "미수집"으로 음영 표시합니다.
+- `safety_lag`와 overlap은 완전성 조건이 아니라 지연 완화 장치입니다. 완전성 주장은 "원격 보존 기간 안에서, 재조회 범위에 들어온 이벤트"로 한정합니다.
+- **승인 기준 문장**: "수집이 불완전하면 그 구간을 다시 읽거나, 누락 구간을 사용자에게 명시한다. 그 판단은 데이터가 아니라 별도 cursor와 gap 기록에서 나온다."
+
+### 1.3 저장 스키마와 집계
+- ReplacingMergeTree의 **`PARTITION BY`는 원본 이벤트 시각 기준**으로 합니다. `collected_at` 기준이면 자정을 넘는 overlap 중복이 영구히 남습니다. TTL도 같은 기준을 씁니다.
+- `ORDER BY`(dedup identity)에서 `collected_at`과 window 정보는 제외합니다. 대신 `query_start_time_microseconds`를 추가합니다. 이렇게 해도 절대 유일성은 아니므로 한계를 문서화합니다.
+- 노드 정체성은 주소나 alias가 아니라 서버가 생성한 nid로 둡니다. 중복 노드 점검에는 probe로 관측한 서버 식별 정보(`serverUUID()` 등)를 씁니다.
+- **모든 Dashboard 쿼리는 dedup 뷰 하나를 경유합니다.** dedup(`FINAL` 등)은 집계보다 먼저 적용합니다.
+- 집계는 행 단위 count로 합니다. `uniqExact(query_id)`로 세면 query_id를 재사용하는 경우가 틀어집니다.
+- 명칭과 라벨을 다음과 같이 정정합니다.
+  - "논리 요청" → **"기록된 initial 쿼리 수"** (재시도는 별개로 세어짐)
+  - 노드 합계 → **"노드 실행 이벤트 수"**
+  - p95 → **"성공 쿼리 지연 p95"** (표본 수 함께 표시)
+  - 전체 p95는 원본 duration을 합쳐서 계산합니다. 노드별 p95를 평균하지 않습니다.
+- 수집기 자신의 쿼리는 원격에서 `is_initial_query=0`으로 기록되므로 "노드 실행" 지표를 오염시킵니다. 설치별 랜덤 `log_comment`를 붙이고 수집 단계에서 제외합니다. 이 값이 원격까지 전파되는지는 실측해야 합니다.
+- 저장과 집계는 UTC로 하고, 표시 타임존은 분리합니다.
+- 관측 범위를 함께 표시합니다. 노드 커버리지, query_log 설정 제약(sampling, 최소 실행 시간), 인증 실패가 query_log에 없다는 점이 여기에 해당합니다.
+
+### 1.4 DDL과 자격증명
+- RMV DDL에는 **서버가 생성한 hex identifier와 내부 ID만** 넣습니다. host, user, password는 NC에만 들어갑니다.
+- identifier 정책과 문자열 리터럴 정책을 분리합니다. 문자열 serializer는 하나로 중앙화하고 `\`와 `'`를 모두 이스케이프합니다. NUL과 제어문자는 거부합니다.
+- parameter binding은 injection 방지 수단이지 비밀 보호 수단이 아닙니다. 요청 body, SQL, params, 원본 예외는 로그와 응답에 남기지 않습니다. 오류는 분류된 코드와 고정 메시지로 치환합니다.
+- password round-trip 테스트를 둡니다. 특수문자, 유니코드, 긴 값으로 NC를 만든 뒤 실제 로그인에 성공하는지 확인합니다.
+
+### 1.5 소유권, 동시성, 복구
+- probe는 **별도 subprocess**로 실행합니다. chDB의 다중 Session 제약 문제를 피하고, hang과 크래시를 격리하며, 하드 kill이 가능하기 때문입니다. password는 stdin으로 넘기고, 키 환경변수는 상속하지 않습니다.
+- Session 호출은 **전용 executor 또는 lock으로 직렬화**합니다. Dashboard 쿼리에는 실행 시간과 행 수 제한을 둡니다.
+- lock은 **chDB open 전에** 잡고, FD를 프로세스 수명 동안 유지합니다. `fcntl.flock`을 쓰고, lock 파일은 다른 곳에서 열거나 교체하지 않습니다.
+- 등록 과정은 작은 상태 머신(`pending → provisioning → active / needs_attention`, deleting)으로 만듭니다.
+  - 기동 시 reconcile에서 chDB의 NC/RMV와 SQLite를 대조합니다.
+  - 등록 시점에 원격이 응답하지 않아 519가 나면 backoff로 재시도합니다.
+  - 삭제 순서는 수집 중단 → NC 제거 → SQLite 정리입니다.
+- **키를 자동 재생성하지 않습니다.** 키는 배타 생성, 0600, 원자적 저장으로 만들고 부모 디렉터리는 0700으로 둡니다. 보호 목표는 "키 없이 data dir만 유출된 경우"로 명시합니다.
+- 원격 hang에 상한을 둡니다. `max_execution_time`, `receive_timeout`, `connect_timeout`을 지정하고, RMV 자체 재시도는 끕니다.
+- TTL과 보존 기간을 반드시 둡니다(예: metrics 3일, query_log 7일). 동시 수집 수도 제한합니다.
+
+### 1.6 topology
+- `system.clusters`는 **후보 목록**일 뿐입니다. 내부 관점의 host/port(docker 이름, 9000번 포트)나 기본 예제 클러스터가 섞여 있습니다.
+- 사용자가 클러스터를 선택하고 노드별 접속 주소를 확정합니다. **커버리지 분모는 이 확정 목록**입니다.
+- 자동 발견에 실패하면 "단일 endpoint 수집"으로 명확히 표시합니다.
+
+### 1.7 보안
+- **Host 헤더 allowlist**를 추가합니다(DNS rebinding 방어, 위반 시 421). Origin 검사, JSON 강제, CORS 미설정을 함께 둡니다. 상태 변경은 GET으로 하지 않습니다.
+- **query_log의 쿼리 원문은 비밀 데이터**로 취급합니다. NC 암호화는 telemetry에 저장된 SQL 원문을 보호하지 않습니다. 표시 길이를 제한하거나 축약하고, 보존 기간을 정합니다.
+- TLS 검증 설정은 NC 단위가 아니라 chDB 전역 설정일 가능성이 큽니다(A 지적, C 이견 없음). UI에서 정직하게 표현합니다.
+
+### 1.8 상태와 과잉설계 정리
+- 상태 정보를 셋으로 분리합니다: **마지막 시도 결과와 성공 시각 / 검사 완료 구간의 끝(`committed_hi`) / 마지막 관측 이벤트 시각**. "지연" 판정은 `committed_hi` 기준으로 합니다. 그래야 유휴 노드가 지연으로 오판되지 않습니다.
+- `collection_status`를 매 폴링마다 append하는 방식은 제거합니다. **SQLite에 최신 상태를 두고, 상태가 전이될 때만 이력을 남깁니다.** chDB가 열리지 않아도 상태를 읽을 수 있어야 하기 때문입니다.
+- 클러스터 상태는 노드 상태 중 최악값으로 하고, 커버리지 배지는 별도로 둡니다.
+- 등록 idempotency key는 제거합니다. unique 제약과 버튼 disable로 충분합니다. 키는 env와 파일 두 경로 중 **파일 경로 하나만** 지원합니다.
+- 반드시 추가할 것: 클러스터 삭제·일시정지, 진단 페이지(노드별 window, 행 수, skew, 오류코드).
+
+### 1.9 Day 0 스파이크
+아키텍처 분기점이 되는 미확인 동작은 UI 구현 전에 검증합니다. 검증은 **chDB 4.4.0(engine 26.9.2.1)이 ClickHouse 26.8 서버에 접속하는 실제 조합**으로 해야 합니다. 서버 단독 검증으로는 부족하다는 C의 보강을 수용했습니다.
+
+---
+
+## 2. 미합의 쟁점
+
+| 쟁점 | A 입장 | C 입장 |
+|---|---|---|
+| **청크 수집 방식** | `ORDER BY … LIMIT` 청크. 경계 규칙을 정정함: LIMIT에 꽉 차면 `>= last_ts` 포함 경계로 이어서 읽고, 청크 전체가 같은 ts이면 해당 ts만 LIMIT 없이 1회 읽은 뒤 +1µs | LIMIT을 쓰지 않음. **시간 구간을 잘게 나누어 각 구간을 끝까지 읽은 뒤에만** cursor 전진. 제한에 걸리면 구간을 더 작게 나누어 재시도 |
+| **CSRF 토큰** | 제거. JSON 강제 + CORS 미설정이면 cross-site 요청이 아예 전송되지 않음. rebinding 상황에서는 공격자가 cookie와 header를 모두 설정할 수 있어 double-submit은 무력함 | 라운드 1에서 JSON + CSRF + SameSite 유지를 주장. 라운드 2에서 A의 반론에 재반박하지 않음 |
+| **키 오류 복구** | fingerprint가 불일치하면 NC를 quarantine으로 옮기고 새 키를 생성한 뒤 "재입력 필요" 상태로 자동 전환 | 자동 전환 반대. 경로 오류나 일시적 접근 오류를 키 유실로 오인할 수 있음. **엔진을 열지 않는 복구 모드**로 띄우고, 운영자가 "키 복원" 또는 "자격증명 초기화"를 명시적으로 선택하게 함 |
+| **metrics snapshot 완전성** | `collected_at`별 행 수가 최빈값 이상인 마지막 snapshot만 사용 | 행 수 추정은 정확성 판정 근거가 될 수 없음. `snapshot_id`와 완료 기록을 쓰거나, "최근 수집값"으로만 표시 |
+| **`hi`의 기준 시계** | 원격 `now()` 기준으로 고정. 원격 시계가 늦으면 로컬 기준 `hi`에서 누락이 생김 | 개선은 맞지만 왕복과 장애 지점이 추가되고, 지연 도착 문제는 해결하지 못함. skew 측정은 진단용으로 두고 완전성 주장 범위를 좁힘 |
+| **기동 시 하한 클램프** | MergeTree는 기본 설정에서 fsync하지 않으므로, 전원 장애 후 cursor가 데이터보다 앞설 수 있음. 기동 시 `lo = min(committed_hi, local_max) - overlap`으로 클램프 | 영속성 의미를 전제 조건으로 명시해야 한다는 데는 동의. 클램프 자체는 다루지 않음 |
+| **endpoint 입력 검증** | host, user에 정규식 적용 | 정규식은 ClickHouse 주소 패턴 문법을 막지 못하고 정상 계정까지 배제할 수 있음. SQL 안전성과 endpoint 의미 검증을 분리하고, host는 단일 DNS 이름 또는 IP로 **파싱**함 |
+| **비밀 유출 검증 기준** | data dir과 로그를 grep해서 0건이어야 함 | 암호화된 NC 안에는 존재할 수 있음. 평문 로그, SQL metadata, 응답에 없어야 한다는 것이 정확한 기준이며, grep 0건만으로는 암호화를 검증할 수 없음 |
+| **구현 비용** | "스케줄러 약 60줄 교체" | 지나치게 낙관적. 취소, 구간 폭 조절, 재시도, 삭제와의 경합까지 구현해야 함 |
+| **오류 판정 임계** | 연속 2회 실패부터 "오류" | 정책으로는 수용. 다만 첫 실패 사실은 즉시 노출해야 함 |
+
+---
+
+## 3. 최종 권고안
+
+미합의 쟁점에 대한 판단부터 정리합니다.
+
+- **청크 방식은 C의 시간 구간 분할을 채택합니다.** A의 정정된 규칙도 동작하지만 동률 처리와 특수 경로가 필요합니다. 시간 구간을 끝까지 읽는 방식은 불변식이 "이 구간을 다 읽었다" 하나로 끝납니다. 구간 폭은 직전 처리량에 맞춰 조절합니다(예: 기본 1분, 실패 시 절반, 성공이 이어지면 두 배, 상한 15분).
+- **CSRF 토큰은 제거합니다(A의 안).** cookie 기반 인증이 없는 loopback 단일 운영자 앱에서 double-submit은 방어에 기여하지 않습니다. Host allowlist, Origin 검사, `Content-Type: application/json` 강제, CORS 미설정, 커스텀 헤더 요구로 충분합니다.
+- **키 오류 복구는 C의 안을 채택합니다.** 비가역 조작은 운영자가 명시적으로 선택한 뒤에만 수행합니다. fingerprint는 "키가 다름"을 진단하는 용도로만 씁니다. 복구 모드에서도 SQLite의 상태 이력과 gap 기록은 읽을 수 있습니다.
+- **metrics는 C의 안을 채택합니다.** "최근 수집값 + metric별 `collected_at`"으로 표시하고 최빈값 휴리스틱은 쓰지 않습니다. 이후 metrics가 Python 경로로 통일되면 완료 기록을 추가합니다.
+- **`hi`는 원격 `now()` 기준으로 잡습니다(A의 안).** Python 루프는 어차피 사이클마다 원격과 왕복하므로 추가 비용이 작습니다. 다만 C의 지적대로 이것을 완전성 근거로 내세우지 않습니다. skew가 5초를 넘으면 진단 페이지에 경고합니다.
+- **기동 하한 클램프를 채택합니다(A의 안).** 정상 상황에서는 영향이 없고 비용도 거의 없습니다. Day 0에서 강제 종료 시나리오로 실제 동작을 확인합니다.
+- **endpoint 검증은 C의 안을 채택합니다.** host는 `ipaddress` 모듈이나 DNS 라벨 파서로 파싱하고, 주소 패턴 문법(`{}`, `|`, `,` 등)은 거부합니다. port는 별도 정수로 받습니다. user와 password는 serializer만 통과시킵니다.
+
+### 실행 순서
+
+**Day 0 스파이크** (chDB 4.4.0 → CH 26.8, 반나절~1일)
+
+| # | 검증 항목 | 실패 시 결정 |
+|---|---|---|
+| 1 | NC를 참조하는 `remoteSecure`에서 상수 WHERE가 원격으로 push down되는지. 원격 query_log의 `query` 텍스트와 `read_rows`로 확인 | 구간 폭 축소, 컬럼 최소화 |
+| 2 | `log_comment`가 원격 query_log까지 전파되는지 | 대체 표식 사용(`initial_query_id` 접두어 등) |
+| 3 | NC가 없을 때 RMV metadata가 로드되고 chDB가 열리는지 | **metrics도 Python 루프로 통일** |
+| 4 | password round-trip 성공 여부, 평문 로그·SQL metadata·응답에 비밀이 남는지 | serializer 수정, 로컬 `query_log`/`text_log` 비활성화 |
+| 5 | 원격 연결을 중간에 끊거나 강제 종료할 때 INSERT…SELECT가 부분 커밋하는지, cursor와 데이터의 관계 | 결과만 기록. 설계가 이 동작에 의존하지 않음을 확인 |
+| 6 | 자정을 넘는 overlap에서 dedup 카운트가 정확한지 | partition 키 재검토 |
+| 7 | 다중 Session 제약, NC/remote secret masking 적용 여부 | probe subprocess 방침 확정 |
+
+**구현 단위**
+
+1. **기반**: flock(open 전 획득), 단일 Session executor, SQLite 스키마(clusters, nodes(phase), cursors, gaps, state_transitions), 키 로딩과 복구 모드.
+2. **등록**: 입력 파싱 → probe subprocess → 후보 노드 확정 UI → NC 생성 → metrics RMV 생성. pending 상태 재시도와 기동 reconcile을 포함합니다.
+3. **query_log 루프**: 노드별 asyncio 태스크가 다음 순서로 동작합니다.
+   1. 원격 `now()`를 조회합니다.
+   2. `[committed_hi − overlap, hi)` 구간에 대해 chDB 안에서 단일 `INSERT INTO raw SELECT <약 15개 컬럼> FROM remoteSecure(nc, system, query_log) WHERE … AND log_comment != {tag}`를 실행합니다. Python이 행을 중계하지 않습니다.
+   3. 문장이 성공하면 cursor를 커밋합니다.
+   4. 실패하면 구간을 분할하여 재시도합니다.
+
+   timeout을 설정하고, 동시 실행 수를 제한하고, 24h를 넘는 구간은 gap으로 기록합니다.
+4. **감사 재조회(A의 1-E, 선택)**: 10분마다 overlap 밖 구간을 재조회하여 늦게 도착한 행 수를 측정하고, 그 값을 진단 페이지에 노출합니다. 이 측정값으로 overlap 설정의 근거를 관측값으로 대체합니다.
+5. **Dashboard**: dedup 뷰 하나를 경유하고, 정정된 라벨을 쓰고, UTC로 계산한 뒤 epoch ms로 응답합니다. gap은 음영으로, 커버리지는 배지로 표시합니다. 쿼리 원문은 축약합니다.
+6. **보안 미들웨어**: Host/Origin 검증, JSON 강제, 예외 sanitizer를 둡니다. 렌더링은 기존대로 textContent를 씁니다.
+7. **수용 테스트**(장애 후 불변식 중심):
+   - 부분 수신 후 연결 종료
+   - 데이터 저장 직후, cursor 커밋 전 kill
+   - overlap보다 늦게 도착한 로그
+   - 24h를 넘는 다운타임
+   - 키 누락 또는 불일치
+   - A 클러스터의 한 노드만 불통
+   - 유휴 노드가 "지연"으로 오판되지 않는지
+
+---
+
+## 4. 참고사항 (추가 조사가 필요한 영역)
+
+- **chDB 쓰기 영속성**: 기본 `fsync_after_insert=0`일 때 전원 장애 후 part가 유실되는 범위를 확인해야 합니다. 클램프로 충분한지, fsync 설정을 켜야 하는지 결정이 필요합니다.
+- **TLS 설정 범위**: chDB에서 `openSSL.client`가 전역으로만 적용되는지, NC 단위 오버라이드가 가능한지 확인해야 합니다. 클러스터별 사설 CA 지원 여부가 여기에 달려 있습니다.
+- **chDB Python 바인딩의 스레드 안전성**: RMV 백그라운드 스레드와 executor 호출이 경합할 때의 동작을 확인해야 합니다.
+- **masking**: chDB 빌드에서 NC와 remote secret masking이 적용되는지, 로컬 `system.query_log`/`text_log`에 DDL이 남는지 확인해야 합니다.
+- **신규 서버에서 `system.query_log`가 아직 없는 경우**: 첫 flush 전에는 테이블이 없으므로 수집 루프와 probe가 이 상태를 "준비 중"으로 다뤄야 합니다.
+- **query_log 지연 도착의 실제 분포**: 부하 상황에서 flush가 얼마나 늦어지는지 측정하여 overlap 기본값의 근거로 삼습니다.
+- **metrics 경로 통일 여부**: Day 0 #3 결과에 따라 RMV를 완전히 제거할지 결정합니다. 하이브리드는 스케줄러, 상태 출처, 실패 모드가 각각 두 벌이 된다는 비용이 있습니다.
+- **`system.metrics`의 표현 한계**: 시점별 gauge만 제공하므로 CPU 사용률이나 처리량 같은 지표가 필요하면 다른 source를 검토해야 합니다. 이번 범위에서는 제외합니다.
+[Council] 리포트: /tmp/council/20261027_183726_70098/report.md
+[Council] 결과 저장: docs/council-result.md
+
+[Council] ━━━ 토큰 & 한도 요약 ━━━
+[Council]   [Token] Claude/runtime-default/runtime-default: 입력 2 / 출력 8311 / 캐시 2123 / 합계 36553
+[Council]   [Token] Codex/runtime-default/runtime-default: 입력 23881 / 출력 2652 / 캐시 0 / 합계 26533
+[Council]   [Tip] Codex 남은 한도: codex 실행 후 /status
+
+[Council] 세션 파일: /tmp/council/20261027_183726_70098
+[Council] 전체 라운드 결과를 확인하려면: ls /tmp/council/20261027_183726_70098/

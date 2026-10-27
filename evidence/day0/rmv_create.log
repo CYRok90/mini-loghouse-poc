@@ -1,0 +1,8 @@
+## roundtrip 18:47:51
+[nc create] OK 
+[nc login] OK b1
+[param login] OK b1
+## rmv 18:47:51
+[nc a1] OK 
+[rmv metrics] OK 
+[rmv query_log] OK 

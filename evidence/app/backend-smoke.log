@@ -1,0 +1,309 @@
+INFO:     Started server process [79425]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8765 (Press CTRL+C to quit)
+INFO:     127.0.0.1:54161 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54162 - "GET /api/health HTTP/1.1" 421 Misdirected Request
+INFO:     127.0.0.1:54163 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54163 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54163 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54163 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54163 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54163 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54163 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54163 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54163 - "POST /api/probe HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:54185 - "POST /api/clusters HTTP/1.1" 201 Created
+INFO:     127.0.0.1:54185 - "POST /api/clusters HTTP/1.1" 201 Created
+INFO:     127.0.0.1:54185 - "POST /api/clusters HTTP/1.1" 409 Conflict
+INFO:     127.0.0.1:54185 - "GET /api/clusters HTTP/1.1" 200 OK
+2026-10-27 19:01:19,800 INFO mlh.supervisor: node n9bf19a0b04ce gap pending [1793094651, 1793095251) initial
+2026-10-27 19:01:19,802 INFO mlh.supervisor: node na20d5a1c1b97 gap pending [1793094651, 1793095251) initial
+2026-10-27 19:01:19,803 INFO mlh.supervisor: node nbc24d126b852 gap pending [1793094651, 1793095251) initial
+INFO:     127.0.0.1:54230 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54243 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54251 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54321 - "GET /api/clusters HTTP/1.1" 200 OK
+2026-10-27 19:02:21,237 ERROR mlh.security: unhandled ChdbError on GET /api/clusters/c5f40eca51dba/dashboard
+INFO:     127.0.0.1:54321 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+RuntimeError: Code: 26. DB::Exception: Cannot parse quoted string: expected opening quote ''', got 'Q': value [Query,TCPConnection,HTTPConnection,MemoryTracking,Merge,BackgroundMergesAndMutationsPoolTask,PartsActive,GlobalThreadActive] cannot be parsed as Array(String) for query parameter 'metrics'. (CANNOT_PARSE_QUOTED_STRING)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/uvicorn/protocols/http/h11_impl.py", line 411, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 63, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/fastapi/applications.py", line 1194, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/applications.py", line 96, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/mlh/security.py", line 48, in guard
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/routing.py", line 683, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/fastapi/routing.py", line 2811, in app
+    await route.handle(scope, receive, send)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/fastapi/routing.py", line 1330, in handle
+    await super().handle(scope, receive, send)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/routing.py", line 289, in handle
+    await self.app(scope, receive, send)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/fastapi/routing.py", line 166, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/fastapi/routing.py", line 152, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/fastapi/routing.py", line 745, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/fastapi/routing.py", line 372, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/mlh/api.py", line 178, in get_dashboard
+    return await run_in_threadpool(dashboard.dashboard, owner, rt.registry, settings, cluster, range, node)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/mlh/dashboard.py", line 183, in dashboard
+    "metrics": _metric_sections(owner, params, node_id),
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/mlh/dashboard.py", line 141, in _metric_sections
+    current = owner.rows(
+              ^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/mlh/chdb_owner.py", line 103, in rows
+    return self._executor.submit(self._rows, sql, params).result()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.11/3.11.11/Frameworks/Python.framework/Versions/3.11/lib/python3.11/concurrent/futures/_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.11/3.11.11/Frameworks/Python.framework/Versions/3.11/lib/python3.11/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/opt/homebrew/Cellar/python@3.11/3.11.11/Frameworks/Python.framework/Versions/3.11/lib/python3.11/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/mlh/chdb_owner.py", line 96, in _rows
+    out = self._session.query(sql, "JSONEachRow", params=params).bytes().decode()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/chdb/session/state.py", line 205, in query
+    return self._conn.query(sql, fmt, params=params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/chdb/state/sqlitelike.py", line 758, in query
+    raise ChdbError(str(e)) from e.with_traceback(None)
+chdb._exceptions.ChdbError: Code: 26. DB::Exception: Cannot parse quoted string: expected opening quote ''', got 'Q': value [Query,TCPConnection,HTTPConnection,MemoryTracking,Merge,BackgroundMergesAndMutationsPoolTask,PartsActive,GlobalThreadActive] cannot be parsed as Array(String) for query parameter 'metrics'. (CANNOT_PARSE_QUOTED_STRING)
+INFO:     127.0.0.1:54328 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54329 - "GET /api/clusters HTTP/1.1" 200 OK
+2026-10-27 19:02:27,742 ERROR mlh.security: unhandled ChdbError on GET /api/clusters/c5f40eca51dba/dashboard
+INFO:     127.0.0.1:54330 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+RuntimeError: Code: 26. DB::Exception: Cannot parse quoted string: expected opening quote ''', got 'Q': value [Query,TCPConnection,HTTPConnection,MemoryTracking,Merge,BackgroundMergesAndMutationsPoolTask,PartsActive,GlobalThreadActive] cannot be parsed as Array(String) for query parameter 'metrics'. (CANNOT_PARSE_QUOTED_STRING)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/uvicorn/protocols/http/h11_impl.py", line 411, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 63, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/fastapi/applications.py", line 1194, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/applications.py", line 96, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/fastapi/telemetry/_asgi.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/middleware/base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/mlh/security.py", line 48, in guard
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/middleware/base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/routing.py", line 683, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/fastapi/routing.py", line 2811, in app
+    await route.handle(scope, receive, send)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/fastapi/routing.py", line 1330, in handle
+    await super().handle(scope, receive, send)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/routing.py", line 289, in handle
+    await self.app(scope, receive, send)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/fastapi/routing.py", line 166, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/fastapi/routing.py", line 152, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/fastapi/routing.py", line 745, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/fastapi/routing.py", line 372, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/mlh/api.py", line 178, in get_dashboard
+    return await run_in_threadpool(dashboard.dashboard, owner, rt.registry, settings, cluster, range, node)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/mlh/dashboard.py", line 183, in dashboard
+    "metrics": _metric_sections(owner, params, node_id),
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/mlh/dashboard.py", line 141, in _metric_sections
+    current = owner.rows(
+              ^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/mlh/chdb_owner.py", line 103, in rows
+    return self._executor.submit(self._rows, sql, params).result()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.11/3.11.11/Frameworks/Python.framework/Versions/3.11/lib/python3.11/concurrent/futures/_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.11/3.11.11/Frameworks/Python.framework/Versions/3.11/lib/python3.11/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/opt/homebrew/Cellar/python@3.11/3.11.11/Frameworks/Python.framework/Versions/3.11/lib/python3.11/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/mlh/chdb_owner.py", line 96, in _rows
+    out = self._session.query(sql, "JSONEachRow", params=params).bytes().decode()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/chdb/session/state.py", line 205, in query
+    return self._conn.query(sql, fmt, params=params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/chdb/state/sqlitelike.py", line 758, in query
+    raise ChdbError(str(e)) from e.with_traceback(None)
+chdb._exceptions.ChdbError: Code: 26. DB::Exception: Cannot parse quoted string: expected opening quote ''', got 'Q': value [Query,TCPConnection,HTTPConnection,MemoryTracking,Merge,BackgroundMergesAndMutationsPoolTask,PartsActive,GlobalThreadActive] cannot be parsed as Array(String) for query parameter 'metrics'. (CANNOT_PARSE_QUOTED_STRING)
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [79425]
+INFO:     Started server process [80175]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8765 (Press CTRL+C to quit)
+INFO:     127.0.0.1:54373 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54398 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54398 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54398 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m&node=n9bf19a0b04ce HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54398 - "GET /api/clusters/c706e6b6cc403/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54398 - "GET /api/clusters/c706e6b6cc403/dashboard?range=15m&node=nbc24d126b852 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54725 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54726 - "GET /clusters/new HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54727 - "GET /static/cluster.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54744 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54744 - "GET /static/app.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54745 - "GET /static/common.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54746 - "GET /static/list.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54746 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54745 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54745 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54759 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54760 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54760 - "GET /static/app.css HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:54760 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54759 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54773 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54774 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54800 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54801 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54814 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54815 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54841 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54854 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54855 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54881 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54882 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54895 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54896 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54909 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54910 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54911 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54911 - "GET /clusters/c5f40eca51dba?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54911 - "GET /static/app.css HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:54910 - "GET /static/common.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:54918 - "GET /static/chart.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54919 - "GET /static/cluster.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54919 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54918 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54932 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54933 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54948 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54949 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54962 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54963 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54976 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54977 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54991 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54992 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55005 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55006 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55020 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55021 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55034 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55035 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK

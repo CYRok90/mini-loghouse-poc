@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>클러스터 추가 · mini-loghouse</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/static/app.css">
+  <script src="/static/common.js" defer></script>
+  <script src="/static/add.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="/">mini-loghouse</a>
+    <a href="/">← 클러스터 목록</a>
+    <span class="scope">로컬 단일 운영자용 (loopback 전용)</span>
+  </header>
+  <main>
+    <h1>클러스터 추가</h1>
+    <p class="sub">수집은 backend 안의 chDB가 <code>remote()</code>/<code>remoteSecure()</code>로 직접 접속합니다. 브라우저는 backend API만 호출합니다.</p>
+    <section class="card">
+      <form class="grid" id="form" autocomplete="off" novalidate>
+        <label for="name">표시 이름</label>
+        <input type="text" id="name" maxlength="64" required placeholder="예: prod-logs-a">
+        <label for="host">host</label>
+        <input type="text" id="host" maxlength="253" required placeholder="IP 주소 또는 DNS 이름 (포트·목록·패턴 없이)">
+        <label for="port">native(TCP) 포트</label>
+        <input type="number" id="port" min="1" max="65535" required placeholder="예: 9000 (평문) / 9440 (TLS)">
+        <p class="hint">수집 경로는 ClickHouse <strong>native TCP protocol</strong>을 사용합니다. HTTP 인터페이스 포트(보통 8123/8443)는 사용할 수 없습니다. 포트 번호만으로 판단하지 않고, 연결 테스트에서 서버 응답으로 확인합니다.</p>
+        <label for="tls">TLS 사용</label>
+        <div><input type="checkbox" id="tls" checked> <span class="small muted">remoteSecure() 사용 · 인증서는 strict 검증 (평문은 격리된 로컬 테스트에서만 권장)</span></div>
+        <label for="username">username</label>
+        <input type="text" id="username" maxlength="64" required autocomplete="off">
+        <label for="password">password</label>
+        <input type="password" id="password" maxlength="256" required autocomplete="new-password">
+        <p class="hint">필요 권한: <code>system.metrics</code>, <code>system.query_log</code> SELECT (필수) · <code>system.clusters</code> SELECT (노드 범위 확인용, 선택). 비밀번호는 backend의 암호화된 chDB named collection에만 저장되며 다시 표시되지 않습니다.</p>
+      </form>
+      <div class="actions">
+        <button type="button" id="test">연결 테스트</button>
+        <button type="button" class="primary" id="save" disabled>저장 및 수집 시작</button>
+        <span id="busy" class="muted small" aria-live="polite"></span>
+      </div>
+    </section>
+    <section class="card" id="result" hidden aria-live="polite"></section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,8 @@
+register A 201 {"id":"c5f40eca51dba"} 0.2s
+register B 201 {"id":"c706e6b6cc403"}
+duplicate A 409 {"error":{"category":"duplicate","message":"이미 등록된 endpoint/계정 또는 노드입니다.","probe":null}}
+t+0s [('cluster-A (TLS)', '준비 중', '일부', 0, [('a1', 'preparing', 'preparing'), ('a2', 'preparing', 'preparing')]), ('cluster-B', '준비 중', '일부', 0, [('b1', 'preparing', 'preparing')])]
+t+6s [('cluster-A (TLS)', '수집 중', '전체 검증됨', 2, [('a1', 'collecting', 'collecting'), ('a2', 'collecting', 'collecting')]), ('cluster-B', '수집 중', '전체 검증됨', 1, [('b1', 'collecting', 'collecting')])]
+t+12s [('cluster-A (TLS)', '수집 중', '전체 검증됨', 2, [('a1', 'collecting', 'collecting'), ('a2', 'collecting', 'collecting')]), ('cluster-B', '수집 중', '전체 검증됨', 1, [('b1', 'collecting', 'collecting')])]
+t+18s [('cluster-A (TLS)', '수집 중', '전체 검증됨', 2, [('a1', 'collecting', 'collecting'), ('a2', 'collecting', 'collecting')]), ('cluster-B', '수집 중', '전체 검증됨', 1, [('b1', 'collecting', 'collecting')])]
+leak in list: False

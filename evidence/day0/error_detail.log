@@ -1,0 +1,21 @@
+[tls_to_plain_port] codes=[('519', 'NetException'), ('279', 'NetException'), ('210', 'NetException')] names=['ALL_CONNECTION_TRIES_FAILED', 'NETWORK_ERROR', 'NO_REMOTE_SHARD_AVAILABLE']
+     519 All attempts to get table structure failed. Log: 
+     279 All connection tries failed. Log: 
+     210 SSL Exception: error:0A00010B:SSL routines::wrong version number, while writing to socket (127.0.0.1:54048 -> 127.0.0.1:19003): (127.0.0.1:1
+[plain_to_tls_port] codes=[('519', 'NetException'), ('279', 'NetException'), ('102', 'NetException')] names=['ALL_CONNECTION_TRIES_FAILED', 'NO_REMOTE_SHARD_AVAILABLE', 'UNEXPECTED_PACKET_FROM_SERVER']
+     519 All attempts to get table structure failed. Log: 
+     279 All connection tries failed. Log: 
+     102 Unexpected packet from server 127.0.0.1:19401 (expected Hello or Exception, got 21): (127.0.0.1:19401, local address: 127.0.0.1:54049). (UNE
+[http_port_as_native] codes=[('519', 'NetException'), ('279', 'NetException'), ('102', 'NetException')] names=['ALL_CONNECTION_TRIES_FAILED', 'NO_REMOTE_SHARD_AVAILABLE', 'UNEXPECTED_PACKET_FROM_SERVER']
+     519 All attempts to get table structure failed. Log: 
+     279 All connection tries failed. Log: 
+     102 Unexpected packet from server 127.0.0.1:18003 (expected Hello or Exception, got 72): (127.0.0.1:18003, local address: 127.0.0.1:54050). (UNE
+[missing_table] codes=[('519', 'NetException'), ('279', 'NetException')] names=['ALL_CONNECTION_TRIES_FAILED', 'NO_REMOTE_SHARD_AVAILABLE']
+     519 All attempts to get table structure failed. Log: 
+     279 All connection tries failed. Log: 
+[wrong_password] codes=[('516', 'Exception')] names=['AUTHENTICATION_FAILED']
+     516 Received from 127.0.0.1:19003. DB::Exception: mlh_collector: Authentication failed: password is incorrect, or there is no user with such nam
+[noperm_query_log] codes=[('497', 'Exception')] names=['ACCESS_DENIED']
+     497 Received from 127.0.0.1:19003. DB::Exception: mlh_noperm: Not enough privileges. To execute this query, it's necessary to have the grant SHO
+RAW: 'Code: 519. DB::NetException: All attempts to get table structure failed. Log: \n\nCode: 279. DB::NetException: All connection tries failed. Log: \n\nThere is no table `system`.`no_such_table` on server: 127.0.0.1:19003\n\n. (ALL_CONNECTION_TRIES_FAILED) (version 26.9.2.1)\n\n. (NO_REMOTE_SHARD_AVAILABLE)'
+RAW: "Code: 60. DB::Exception: Received from 127.0.0.1:19003. DB::Exception: Unknown table expression identifier 'system.no_such_table' in scope SELECT count() FROM system.no_such_table. Stack trace:\n\n0. Poco::Exception::Exception(String&&, int) @ 0x0000000119eae8fc\n1. DB::Exception::Exception(DB::Exception::MessageMasked&&, int, bool) @ 0x0000000109e9ecf0\n2. DB::Exception::Exception(String&&, int, String, bool) @ 0x0000000104539258\n3. DB::Exception::Exception(PreformattedMessage&&, int) @ 0x0000000104538d6c\n4. DB::Exception::Exception<String const&, String>(int, FormatStringHelperImpl<std::type_identity<String const&>::type, std::type_identity<String>::type>, String const&, String&&) @ 0x0000000105105200\n5. DB::QueryAnalyzer::initializeQueryJoinTreeNode(std::shared_ptr<DB::IQueryTreeNode>&, DB::IdentifierResolveScope&) @ 0x000000010f135b54\n6. DB::QueryAnalyzer::resolveQuery(std::shared_ptr<DB::IQueryTreeNode> const&, DB::IdentifierResolveScope&) @ 0x000000010f10d2c4\n7. DB::QueryAnalyzer::resolve(std::shared_ptr<DB::IQueryTreeNode>&, std::shared_ptr<DB::ITableExpressionNode> const&, std::shared_ptr<DB::Context const>) @ 0x000000010f10c2e4\n8. DB::QueryAnalysisPass::run(std::sha

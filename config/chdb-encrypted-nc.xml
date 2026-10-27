@@ -1,0 +1,9 @@
+<clickhouse>
+    <!-- Named collections (remote credentials) are stored encrypted on disk.
+         The key is NOT stored here: it is read from the MLH_NC_KEY_HEX env var. -->
+    <named_collections_storage>
+        <type>local_encrypted</type>
+        <algorithm>aes_128_ctr</algorithm>
+        <key_hex from_env="MLH_NC_KEY_HEX"/>
+    </named_collections_storage>
+</clickhouse>

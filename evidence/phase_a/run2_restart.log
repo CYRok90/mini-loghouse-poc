@@ -1,0 +1,20 @@
+## gap: no process holds db for 15s, start 18:30:24
+## restart + idle-2 (22s no SQL) 18:30:39
+opened 2026-10-27T09:30:39.236265+00:00 before {'c': 8, 'm': '2026-10-27 09:30:39.233'}
+idle window 2026-10-27T09:30:39.237196+00:00 -> 2026-10-27T09:31:01.247346+00:00
+refreshes inside idle window 5 ['2026-10-27 09:30:40.011', '2026-10-27 09:30:45.010', '2026-10-27 09:30:50.007', '2026-10-27 09:30:55.011', '2026-10-27 09:31:00.010']
+verdict PASS
+## inspect 18:31:01
+count [{'c': 14, 'lo': '2026-10-27 09:29:46.484', 'hi': '2026-10-27 09:31:01.418'}]
+mv [{'create_table_query': "CREATE MATERIALIZED VIEW phase_a.tick_mv REFRESH EVERY 5 SECOND APPEND TO phase_a.ticks (`refreshed_at` DateTime64(3, 'UTC'), `pid` UInt32) DEFINER = default SQL SECURITY DEFINER AS SELECT now64(3, 'UTC') AS refreshed_at, toUInt32(0) AS pid"}]
+view_refreshes [{'view': 'tick_mv', 'status': 'Scheduled', 'last_success': '2026-10-27 18:31:01', 'next_refresh': '2026-10-27 18:31:05', 'exception': ''}]
+gap rows (should be none between last run and restart):
+
+total 0
+drwxr-xr-x@ 6 choihouse  staff  192 Oct 27 18:31 .
+drwxr-xr-x@ 3 choihouse  staff   96 Oct 27 18:29 ..
+drwxr-xr-x@ 3 choihouse  staff   96 Oct 27 18:29 data
+drwxr-xr-x@ 4 choihouse  staff  128 Oct 27 18:29 metadata
+drwxr-xr-x@ 4 choihouse  staff  128 Oct 27 18:29 store
+drwxr-xr-x@ 2 choihouse  staff   64 Oct 27 18:29 tmp
+/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/var/phase_a.chdb/metadata/phase_a.sql

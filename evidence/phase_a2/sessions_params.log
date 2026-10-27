@@ -1,0 +1,34 @@
+A version OK "26.9.2.1"
+B same path OK 1
+C memory open ERR Failed to create connection: Code: 36. DB::Exception: EmbeddedServer already initialized with path '/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/var/a3.chdb', c
+D other path open ERR Failed to create connection: Code: 36. DB::Exception: EmbeddedServer already initialized with path '/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/var/a3.chdb', c
+param remote ERR Code: 519. DB::NetException: All attempts to get table structure failed. Log: 
+param remoteSecure ERR Code: 519. DB::NetException: All attempts to get table structure failed. Log: 
+param NC DDL ERR Code: 62. DB::Exception: Syntax error: failed at position 47 (}): }, port=1. Expected one of: substitution type (identifier), end of query. (SYNTAX_ERROR)
+param in CREATE TABLE default OK 
+param in MV select OK 
+fast query on same session during slow probe: 1.79s OK 42
+fast query on A while slow on B: 1.80s OK 43
+log-like files: []
+stored MV with param: "CREATE MATERIALIZED VIEW t.mv REFRESH EVERY 1 HOUR (`s` String) ENGINE = Memory DEFINER = default SQL SECURITY DEFINER AS SELECT 'zz' AS s"
+"CREATE TABLE t.x (`a` String DEFAULT 'zz') ENGINE = Memory"
+
+foreground SELECT 1 during ~4s background refreshes: n=131 max=0.003s p50=0.0018s
+RuntimeError: Code: 47. DB::Exception: Unknown expression identifier `last_refresh_result`. Maybe you meant: ['last_refresh_replica']. In scope SELECT view, status, toString(last_success_time), last_refresh_result FROM system.view_refreshes WHERE view = 'slow_mv'. (UNKNOWN_IDENTIFIER)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<stdin>", line 13, in <module>
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/chdb/session/state.py", line 205, in query
+    return self._conn.query(sql, fmt, params=params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/choihouse/Develop/ai-barracks-yr/data_engineering/artifacts/mini-loghouse-poc/.venv/lib/python3.11/site-packages/chdb/state/sqlitelike.py", line 758, in query
+    raise ChdbError(str(e)) from e.with_traceback(None)
+chdb._exceptions.ChdbError: Code: 47. DB::Exception: Unknown expression identifier `last_refresh_result`. Maybe you meant: ['last_refresh_replica']. In scope SELECT view, status, toString(last_success_time), last_refresh_result FROM system.view_refreshes WHERE view = 'slow_mv'. (UNKNOWN_IDENTIFIER)
+['database:String','view:String','uuid:UUID','status:String','last_success_time:Nullable(DateTime)','last_success_duration_ms:Nullable(UInt64)','last_refresh_time:Nullable(DateTime)','last_refresh_replica:String','next_refresh_time:Nullable(DateTime)','exception:String','retry:UInt64','progress:Nullable(Float64)','read_rows:Nullable(UInt64)','read_bytes:Nullable(UInt64)','total_rows:Nullable(UInt64)','written_rows:Nullable(UInt64)','written_bytes:Nullable(UInt64)']
+
+"slow_mv","Running",\N,"2026-10-27 18:38:33","",0
+
+24,"2026-10-27 18:38:11.067","2026-10-27 18:38:20.001"
+

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>클러스터 Dashboard · mini-loghouse</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/static/app.css">
+  <script src="/static/common.js" defer></script>
+  <script src="/static/chart.js" defer></script>
+  <script src="/static/cluster.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="/">mini-loghouse</a>
+    <a href="/">← 클러스터 목록</a>
+    <span class="scope">로컬 단일 운영자용 (loopback 전용)</span>
+  </header>
+  <main>
+    <section id="head"><p class="muted">불러오는 중…</p></section>
+    <div id="banners" aria-live="polite"></div>
+    <div class="toolbar" role="toolbar" aria-label="Dashboard 필터">
+      <div class="seg" id="ranges">
+        <button type="button" data-range="15m">최근 15분</button>
+        <button type="button" data-range="1h">최근 1시간</button>
+        <button type="button" data-range="24h">최근 24시간</button>
+      </div>
+      <label class="small">노드 <select id="node"><option value="">전체 노드</option></select></label>
+      <button type="button" id="refresh">새로고침</button>
+      <label class="small"><input type="checkbox" id="auto" checked> 자동 갱신 (10초)</label>
+      <span class="spacer"></span>
+      <span class="small muted" id="freshness"></span>
+    </div>
+    <section class="card"><h2>노드별 수집 상태</h2><div id="nodes"></div></section>
+    <div class="tiles" id="tiles"></div>
+    <div class="charts">
+      <section class="card">
+        <h2>시간대별 기록된 initial 쿼리 수</h2>
+        <div class="legend"><span><span class="key" id="key-ok"></span>성공 (QueryFinish)</span><span><span class="key" id="key-fail"></span>실패 (Exception*)</span><span><span class="key uncovered"></span>미수집 구간</span></div>
+        <div class="chart-wrap" id="chart-count"></div>
+      </section>
+      <section class="card">
+        <h2>성공 쿼리 지연 p95 (ms)</h2>
+        <div class="legend"><span><span class="key uncovered"></span>미수집 구간</span><span class="muted">점이 없는 구간 = 성공 쿼리 표본 없음</span></div>
+        <div class="chart-wrap" id="chart-p95"></div>
+      </section>
+    </div>
+    <section class="card">
+      <h2>system.metrics (수집된 snapshot · 노드 합계)</h2>
+      <p class="small muted">현재값은 노드별 최신 snapshot의 합계, 추이는 버킷 내 노드별 최댓값의 합계입니다. 수집하지 않은 CPU·디스크 지표는 표시하지 않습니다.</p>
+      <div class="metrics" id="metrics"></div>
+    </section>
+    <section class="card">
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" data-tab="recent" aria-selected="true">최근 쿼리</button>
+        <button type="button" role="tab" data-tab="slow" aria-selected="false">느린 쿼리</button>
+        <button type="button" role="tab" data-tab="errors" aria-selected="false">오류 쿼리</button>
+      </div>
+      <div id="table"></div>
+    </section>
+    <section class="card">
+      <details class="definitions">
+        <summary>집계 정의와 수집 방식</summary>
+        <dl>
+          <dt>기록된 initial 쿼리 수</dt><dd>is_initial_query = 1 이고 type이 QueryFinish / ExceptionBeforeStart / ExceptionWhileProcessing인 행. QueryStart는 세지 않으므로 같은 쿼리가 두 번 세어지지 않습니다. 클라이언트 재시도는 별개 쿼리로 셉니다.</dd>
+          <dt>실패 수</dt><dd>initial 쿼리 중 ExceptionBeforeStart / ExceptionWhileProcessing. 인증 실패처럼 query_log에 남지 않는 실패는 포함되지 않습니다.</dd>
+          <dt>노드 실행 이벤트 수</dt><dd>모든 노드의 비-QueryStart 행. 분산 쿼리가 각 shard에서 실행한 하위 쿼리(is_initial_query = 0)를 포함하므로 논리 요청 수와 다릅니다.</dd>
+          <dt>성공 쿼리 지연 p95</dt><dd>initial QueryFinish 행의 query_duration_ms에 대한 quantileExact(0.95). 노드별 p95를 평균하지 않고 원본 값을 합쳐 계산합니다. 표본 수를 함께 표시합니다.</dd>
+          <dt>중복 제거</dt><dd>(cluster, node, event_time_microseconds, type, query_id, query_start_time_microseconds) 기준 ReplacingMergeTree + FINAL. query_id만으로 합치지 않습니다.</dd>
+          <dt>수집 경로</dt><dd>노드마다 chDB Refreshable MV가 remote()/remoteSecure()로 system.metrics(snapshot APPEND)와 system.query_log(고정 재조회 구간 APPEND)를 가져옵니다. backend 중단 등 재조회 구간을 넘는 공백은 gap으로 기록되고 명시적 backfill로 메워집니다. 수집기 자신의 쿼리는 log_comment로 제외합니다.</dd>
+          <dt>시각</dt><dd>저장·집계는 UTC, 표시는 브라우저 시간대입니다. 수집 구간 경계는 수집 앱(chDB)의 시계 기준입니다.</dd>
+        </dl>
+      </details>
+    </section>
+  </main>
+</body>
+</html>

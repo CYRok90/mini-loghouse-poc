@@ -1,0 +1,16 @@
+Row 1:
+──────
+user:                     mlh_collector
+log_comment:              mlh-day0
+is_initial_query:         0
+read_rows:                107
+substring(re⋯'), 1, 330): SELECT 'c_day0' AS `cluster_id`, 'n_a1' AS `node_id`, displayName() AS `source_display_name`, `__table1`.`event_time` AS `event_time`, `__table1`.`event_time_microseconds` AS `event_time_microseconds`, `__table1`.`query_start_time_microseconds` AS `query_start_time_microseconds`, toString(`__table1`.`type`) AS `type`, `__table1`
+
+Row 2:
+──────
+user:                     mlh_collector
+log_comment:              mlh-day0
+is_initial_query:         0
+read_rows:                91
+substring(re⋯'), 1, 330): DESC TABLE system.query_log
+WHERE (`__table1`.`event_time` >= _CAST(1793094485, \'DateTime\')) AND (`__table1`.`event_time` < _CAST(1793094517, \'DateTime\')) AND (`__table1`.`log_comment` != \'mlh-day0\')

@@ -1,0 +1,20 @@
+## probe 18:47:12
+[local displayName/hostName] OK akong-ine-ui-Macmini.local	akong-ine-ui-Macmini.local
+[probe a1 outer-fn] OK 26.8.34.13	a1	d8d28e80-3a0c-4b5b-8810-82520b6be186	akong-ine-ui-Macmini.local	0
+[probe a1 view()] OK 26.8.34.13	a1	d8d28e80-3a0c-4b5b-8810-82520b6be186	Asia/Seoul	2026-10-27 18:47:13.038
+[probe a1 clusters] OK cluster_a	1	1	127.0.0.1	19401	1
+cluster_a	2	1	127.0.0.1	19402	0
+[probe b1 plain] OK b1
+## errors 18:47:13
+[err tls_to_plain_port] 0.15s ERR(leak=False) . (ALL_CONNECTION_TRIES_FAILED) (version 26.9.2.1) | . (NO_REMOTE_SHARD_AVAILABLE)
+[err plain_to_tls_port] 0.00s ERR(leak=False) . (ALL_CONNECTION_TRIES_FAILED) (version 26.9.2.1) | . (NO_REMOTE_SHARD_AVAILABLE)
+[err http_port_as_native] 0.00s ERR(leak=False) . (ALL_CONNECTION_TRIES_FAILED) (version 26.9.2.1) | . (NO_REMOTE_SHARD_AVAILABLE)
+[err wrong_password] 0.00s ERR(leak=False) 15. thread_start @ 0x0000000188584cec | . (AUTHENTICATION_FAILED)
+[err noperm_query_log] 0.00s ERR(leak=False) 22. thread_start @ 0x0000000188584cec | . (ACCESS_DENIED)
+[err noperm_metrics] 0.00s ERR(leak=False) 22. thread_start @ 0x0000000188584cec | . (ACCESS_DENIED)
+[err missing_table] 0.00s ERR(leak=False) . (ALL_CONNECTION_TRIES_FAILED) (version 26.9.2.1) | . (NO_REMOTE_SHARD_AVAILABLE)
+[err collector_query_log] 0.01s OK 4
+## roundtrip 18:47:13
+[nc create] ERR(leak=False) Code: 62. DB::Exception: Syntax error: failed at position 28 (REPLACE): REPLACE nc_rt AS host='127.0.0.1', port=19003, user='mlh_rt', password='pa\'ss\\wo{rd}"ü한글 %s ;--'. Expected one of: ON, AS, end of query. (SYNTAX_ERROR)
+[nc login] ERR(leak=False) Code: 669. DB::Exception: There is no named collection `nc_rt`. (NAMED_COLLECTION_DOESNT_EXIST)
+[param login] OK b1

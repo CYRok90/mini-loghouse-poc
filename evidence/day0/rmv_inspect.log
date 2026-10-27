@@ -1,0 +1,14 @@
+holding session 45s (no SQL) from 18:48:03
+[metrics rows] OK 6083	11	['a1']	2026-10-27 09:48:45.048
+[metrics rows per refresh] OK [553,553,553,553,553,553,553,553,553,553,553]
+[qlog raw vs final] OK 24	8	8
+[qlog tagged events] OK day0w-a1-err-0	['QueryStart','ExceptionWhileProcessing']
+day0w-a1-ok-0	['QueryStart','QueryFinish']
+day0w-a1-ok-1	['QueryStart','QueryFinish']
+day0w-a1-ok-2	['QueryStart','QueryFinish']
+[view_refreshes] OK day0_metrics_mv	Scheduled	2026-10-27 18:48:45	
+day0_qlog_mv	Scheduled	2026-10-27 18:48:45
+[ddl stored] OK day0_metrics_mv	CREATE MATERIALIZED VIEW telemetry.day0_metrics_mv REFRESH EVERY 5 SECOND APPEND TO telemetry.metrics_raw (`cluster_id` String, `node_id` String, `source_display_name` String, `collected_at` DateTime64(3, \'UTC\'), `metric` String, `value` Int64) DEFINER = default SQL SECURITY DEFINER AS SELECT \'c_day0\' AS cluster_id, \'n_a1\' AS node_id, displayName() AS source_display_name, now64(3, \'UTC\') AS collected_at, metric, value FROM remoteSecure(nc_day0_a1, database = \'system\', `table` = \'metrics\') SETTINGS log_comment = \'mlh-day0\'
+day0_qlog_mv	CREATE MATERIALIZED VIEW telemetry.day0_qlog_mv REFRESH EVERY 5 SECOND APPEND TO telemetry.query_log_raw (`cluster_id` String, `node_id` String, `source_display_name` String, `event_time` DateTime, `event_time_microseconds` DateTime64(6), `query_start_time_microseconds` DateTime64(6), `type` String, `query_id` String, `is_initial_query` UInt8, `query_duration_ms` UInt64, `log_comment` String, `collected_at` DateTime64(3, \'UTC\')) DEFINER = default SQL SECURITY DEFINER AS SELECT \'c_day0\' AS cluster_id, \'n_a1\' AS node_id, displayName() AS source_display_name, event_time, event_time_microseconds, query_start_time_microseconds, toString(type) AS type, query_id, is_initial_query, query_duration_ms, log_comment, now64(3, \'UTC\') AS collected_at FROM remoteSecure(nc_day0_a1, database = \'system\', `table` = \'query_log\') WHERE (event_time >= (now() - toIntervalSecond(40))) AND (event_time < (now() - toIntervalSecond(8))) AND (log_comment != \'mlh-day0\') SETTINGS log_comment = \'mlh-day0\'
+[local system.query_log exists] OK 0
+[plaintext secrets in chdb path] []

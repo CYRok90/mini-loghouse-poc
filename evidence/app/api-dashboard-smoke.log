@@ -1,0 +1,14 @@
+cluster-A (TLS) 수집 중 전체 검증됨 last_check {'at_ms': 1793095390000, 'ok': True, 'source': 'collection'}
+   summary {'initial_queries': 10, 'initial_failed': 2, 'node_events': 10, 'query_start_rows': 10, 'p95_ms': 20, 'p95_samples': 8}
+   series buckets 1 recent 10 smoke1 rows 10 errors 2 slow 8
+   smoke1 by node [('a1', 'ExceptionWhileProcessing'), ('a1', 'QueryFinish'), ('a2', 'ExceptionWhileProcessing'), ('a2', 'QueryFinish')]
+   metrics current ['BackgroundMergesAndMutationsPoolTask', 'GlobalThreadActive', 'HTTPConnection', 'MemoryTracking', 'Merge', 'PartsActive', 'Query', 'TCPConnection'] 16
+   metric series points 24 coverage {"n9bf19a0b04ce": {"collected_from_ms": 1793094651000, "committed_hi_ms": 1793095382000, "gaps": []}, "na20d5a1c1b97": {"collected_from_ms": 1793094651000, "committed_hi_ms": 1793095382000, "gaps": []}}
+   node filter a1 {'initial_queries': 5, 'initial_failed': 1, 'node_events': 5, 'query_start_rows': 5, 'p95_ms': 20, 'p95_samples': 4}
+cluster-B 수집 중 전체 검증됨 last_check {'at_ms': 1793095390000, 'ok': True, 'source': 'collection'}
+   summary {'initial_queries': 5, 'initial_failed': 1, 'node_events': 5, 'query_start_rows': 5, 'p95_ms': 9, 'p95_samples': 4}
+   series buckets 1 recent 5 smoke1 rows 5 errors 1 slow 4
+   smoke1 by node [('b1', 'ExceptionWhileProcessing'), ('b1', 'QueryFinish')]
+   metrics current ['BackgroundMergesAndMutationsPoolTask', 'GlobalThreadActive', 'HTTPConnection', 'MemoryTracking', 'Merge', 'PartsActive', 'Query', 'TCPConnection'] 8
+   metric series points 24 coverage {"nbc24d126b852": {"collected_from_ms": 1793094651000, "committed_hi_ms": 1793095382000, "gaps": []}}
+   node filter b1 {'initial_queries': 5, 'initial_failed': 1, 'node_events': 5, 'query_start_rows': 5, 'p95_ms': 9, 'p95_samples': 4}
