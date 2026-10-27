@@ -14,11 +14,12 @@ const Charts = (() => {
     return node;
   }
 
+  // Axis max = 4 x a 1/2/5 step, so the four grid lines land on round numbers.
   function niceMax(v) {
-    if (!(v > 0)) return 1;
-    const p = Math.pow(10, Math.floor(Math.log10(v)));
-    const m = v / p;
-    return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p;
+    const raw = Math.max(v, 4) / 4;
+    const p = Math.pow(10, Math.floor(Math.log10(raw)));
+    const m = raw / p;
+    return 4 * (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p;
   }
 
   function timeTicks(from, to) {

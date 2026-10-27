@@ -27,7 +27,7 @@
   function checkLine(label, check) {
     if (!check) return el("li", { class: "check-skip", text: `${label}: 접속 실패로 검사하지 않음` });
     if (check.ok) {
-      const rows = Array.isArray(check.rows) ? `${check.rows.length}행` : `${check.rows}행`;
+      const rows = Array.isArray(check.rows) ? `${check.rows.length}행` : label.startsWith("system.query_log") ? `최근 1시간 ${check.rows}행` : `${check.rows}행`;
       return el("li", { class: "check-ok", text: `${label}: 조회 가능 (${rows})` });
     }
     return el("li", { class: "check-fail", text: `${label}: ${errorText(check)}` });

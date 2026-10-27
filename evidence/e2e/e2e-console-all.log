@@ -1,0 +1,15 @@
+Total messages: 1 (Errors: 1, Warnings: 0)
+Returning 12 messages for level "debug"
+
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://127.0.0.1:8765/favicon.ico:0
+[ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:8765/api/clusters/c5f40eca51dba:0
+[ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:8765/api/clusters/c5f40eca51dba/dashboard?range=15m:0
+[ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:8765/api/clusters/c5f40eca51dba:0
+[ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:8765/api/clusters/c5f40eca51dba/dashboard?range=15m:0
+[ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:8765/api/clusters/c5f40eca51dba:0
+[ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:8765/api/clusters/c5f40eca51dba/dashboard?range=15m:0
+[ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:8765/api/clusters/c5f40eca51dba:0
+[ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:8765/api/clusters/c5f40eca51dba/dashboard?range=15m:0
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://127.0.0.1:8765/api/clusters/c5f40eca51dba:0
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://127.0.0.1:8765/api/clusters/c5f40eca51dba/dashboard?range=15m:0
+[ERROR] Failed to load resource: the server responded with a status of 409 (Conflict) @ http://127.0.0.1:8765/api/clusters:0

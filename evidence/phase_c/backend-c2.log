@@ -2231,3 +2231,29 @@ INFO:     127.0.0.1:54127 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
 INFO:     127.0.0.1:54128 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
 INFO:     127.0.0.1:54141 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
 INFO:     127.0.0.1:54142 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54155 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54156 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54171 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54172 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54191 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54191 - "DELETE /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54191 - "DELETE /api/clusters/c706e6b6cc403 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54191 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54192 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54193 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54193 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54193 - "GET /static/app.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54192 - "GET /static/common.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:54193 - "GET /static/list.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:54193 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54192 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54194 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54195 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54197 - "GET /clusters/new HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54197 - "GET /static/add.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54200 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54198 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [85074]

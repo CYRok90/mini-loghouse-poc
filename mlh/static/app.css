@@ -145,3 +145,5 @@ code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-
 #key-fail { background: var(--status-critical); }
 td.num, td.mono { white-space: nowrap; }
 #table table { font-size: 13px; }
+#result ul { list-style: none; padding-left: 4px; }
+th { white-space: nowrap; }

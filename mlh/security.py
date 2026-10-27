@@ -56,6 +56,8 @@ def install(app: FastAPI, port: int) -> None:
         response.headers["X-Frame-Options"] = "DENY"
         if request.url.path.startswith("/api/"):
             response.headers["Cache-Control"] = "no-store"
+        else:  # pages/static: always revalidate (ETag) so UI fixes are never masked by a stale cache
+            response.headers["Cache-Control"] = "no-cache"
         return response
 
     @app.exception_handler(RequestValidationError)

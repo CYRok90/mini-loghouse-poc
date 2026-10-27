@@ -1,0 +1,118 @@
+INFO:     Started server process [1494]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8765 (Press CTRL+C to quit)
+INFO:     127.0.0.1:54209 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54210 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54211 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54214 - "GET /static/common.js?v=2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54215 - "HEAD /static/common.js?v=2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54212 - "GET /clusters/new HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54212 - "GET /static/app.css?v=2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54216 - "GET /static/common.js?v=2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54217 - "GET /static/add.js?v=2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54219 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54223 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54229 - "POST /api/clusters HTTP/1.1" 201 Created
+INFO:     127.0.0.1:54229 - "GET /clusters/ceb26d8253e22 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54238 - "GET /static/common.js?v=2 HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:54229 - "GET /static/app.css?v=2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54238 - "GET /static/chart.js?v=2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54229 - "GET /static/cluster.js?v=2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54229 - "GET /api/clusters/ceb26d8253e22 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54238 - "GET /api/clusters/ceb26d8253e22/dashboard?range=1h HTTP/1.1" 200 OK
+2026-10-27 22:14:14,177 INFO mlh.supervisor: node n2d1a6b3ba106 gap pending [1793106226, 1793106826) initial
+INFO:     127.0.0.1:54239 - "GET /api/clusters/ceb26d8253e22 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54246 - "GET /api/clusters/ceb26d8253e22/dashboard?range=1h HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54251 - "GET /api/clusters/ceb26d8253e22 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54252 - "GET /api/clusters/ceb26d8253e22/dashboard?range=1h HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54252 - "GET /clusters/ceb26d8253e22?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54252 - "GET /static/app.css?v=3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54251 - "GET /static/common.js?v=3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54258 - "GET /static/cluster.js?v=3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54257 - "GET /static/chart.js?v=3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54257 - "GET /api/clusters/ceb26d8253e22 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54258 - "GET /api/clusters/ceb26d8253e22/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54264 - "GET /api/clusters/ceb26d8253e22 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54265 - "GET /api/clusters/ceb26d8253e22/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54270 - "GET /api/clusters/ceb26d8253e22 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54271 - "GET /api/clusters/ceb26d8253e22/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54271 - "GET /clusters/new HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54270 - "GET /static/common.js?v=4 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54271 - "GET /static/app.css?v=4 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54274 - "GET /static/add.js?v=4 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54285 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54300 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54306 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54320 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54320 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54320 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54320 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54320 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54320 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54320 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54320 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54335 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54335 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54335 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54335 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54355 - "GET /clusters/new HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54356 - "GET /static/common.js?v=4 HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:54355 - "GET /static/app.css?v=4 HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:54357 - "GET /static/add.js?v=4 HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:54357 - "POST /api/probe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54375 - "POST /api/clusters HTTP/1.1" 201 Created
+INFO:     127.0.0.1:54375 - "GET /clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54391 - "GET /static/common.js?v=4 HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:54375 - "GET /static/app.css?v=4 HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:54393 - "GET /static/cluster.js?v=4 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54392 - "GET /static/chart.js?v=4 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54392 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54393 - "GET /api/clusters/c17d44ea61b79/dashboard?range=1h HTTP/1.1" 200 OK
+2026-10-27 22:17:25,353 INFO mlh.supervisor: node na976f56792d5 gap pending [1793106418, 1793107018) initial
+2026-10-27 22:17:25,353 INFO mlh.supervisor: node n79945e956cbd gap pending [1793106418, 1793107018) initial
+INFO:     127.0.0.1:54412 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54413 - "GET /api/clusters/c17d44ea61b79/dashboard?range=1h HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54420 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54439 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54440 - "GET /api/clusters/c17d44ea61b79/dashboard?range=1h HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54453 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54454 - "GET /api/clusters/c17d44ea61b79/dashboard?range=1h HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54467 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54468 - "GET /api/clusters/c17d44ea61b79/dashboard?range=1h HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54481 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54482 - "GET /api/clusters/c17d44ea61b79/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54482 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54481 - "GET /api/clusters/c17d44ea61b79/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54495 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54496 - "GET /api/clusters/c17d44ea61b79/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54503 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54504 - "GET /api/clusters/c17d44ea61b79/dashboard?range=15m&node=n79945e956cbd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54504 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54503 - "GET /api/clusters/c17d44ea61b79/dashboard?range=15m&node=n79945e956cbd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54523 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54524 - "GET /api/clusters/c17d44ea61b79/dashboard?range=15m&node=n79945e956cbd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54541 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54542 - "GET /api/clusters/c17d44ea61b79/dashboard?range=15m&node=n79945e956cbd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54564 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54565 - "GET /api/clusters/c17d44ea61b79/dashboard?range=15m&node=n79945e956cbd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54587 - "GET /clusters/c17d44ea61b79?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54588 - "GET /static/common.js?v=4 HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:54587 - "GET /static/app.css?v=4 HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:54590 - "GET /static/chart.js?v=4 HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:54589 - "GET /static/cluster.js?v=4 HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:54589 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54590 - "GET /api/clusters/c17d44ea61b79/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54611 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54612 - "GET /api/clusters/c17d44ea61b79/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54612 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54611 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54643 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54644 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54658 - "GET /clusters/new HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54659 - "GET /static/common.js?v=4 HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:54658 - "GET /static/app.css?v=4 HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:54660 - "GET /static/add.js?v=4 HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:54660 - "POST /api/probe HTTP/1.1" 200 OK
+2026-10-27 22:19:46,342 INFO mlh.supervisor: node n79945e956cbd gap pending [1793107117, 1793107158) collection_interrupted
+INFO:     127.0.0.1:54660 - "POST /api/clusters HTTP/1.1" 409 Conflict

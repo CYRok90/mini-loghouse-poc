@@ -41,7 +41,7 @@ _RULES: tuple[tuple[str, re.Pattern[str], str], ...] = (
      "ClickHouse native protocol 응답이 아닙니다. endpoint와 포트를 확인하세요."),
     ("auth", re.compile(r"AUTHENTICATION_FAILED|Code: 516\."), "인증에 실패했습니다 (사용자 이름 또는 비밀번호)."),
     ("access_denied", re.compile(r"ACCESS_DENIED|Code: 497\.|Not enough privileges"),
-     "필수 system table 조회 권한이 없습니다."),
+     "system table 조회 권한이 없습니다 (ACCESS_DENIED)."),
     ("table_missing", re.compile(r"There is no table|UNKNOWN_TABLE|Code: 60\."),
      "필요한 system table이 없습니다 (비활성화되었거나 첫 flush 전)."),
     ("column_missing", re.compile(r"UNKNOWN_IDENTIFIER|Code: 47\."),
@@ -50,7 +50,7 @@ _RULES: tuple[tuple[str, re.Pattern[str], str], ...] = (
      "저장된 자격증명(named collection)이 없습니다. 재입력이 필요합니다."),
     ("refused", re.compile(r"Connection refused"), "연결이 거부되었습니다 (포트가 닫혀 있거나 서버 중지)."),
     ("timeout", re.compile(r"SOCKET_TIMEOUT|Timeout: connect timed out|TIMEOUT_EXCEEDED|Timeout exceeded", re.I),
-     "제한 시간 안에 응답이 없습니다."),
+     "제한 시간 안에 응답이 없습니다. (원인 미확정: 방화벽·서버 지연 외에 HTTP 등 다른 protocol 포트도 응답 없이 timeout 될 수 있음)"),
     ("network", re.compile(r"NETWORK_ERROR|Connection reset|Broken pipe|Net Exception", re.I), "네트워크 오류가 발생했습니다."),
 )
 

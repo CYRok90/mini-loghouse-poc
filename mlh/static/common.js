@@ -6,7 +6,8 @@ const MLH = (() => {
   const JSON_HEADERS = { "Content-Type": "application/json", "X-MLH-Request": "1" };
 
   async function api(path, options = {}) {
-    const init = { method: options.method || "GET", headers: {}, cache: "no-store" };
+    const method = options.method || (options.body !== undefined ? "POST" : "GET");
+    const init = { method, headers: {}, cache: "no-store" };
     if (options.body !== undefined) {
       init.headers = { ...JSON_HEADERS };
       init.body = JSON.stringify(options.body);

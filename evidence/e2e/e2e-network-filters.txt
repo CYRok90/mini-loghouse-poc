@@ -1,0 +1,26 @@
+5. [POST] http://127.0.0.1:8765/api/probe => [200] OK
+6. [POST] http://127.0.0.1:8765/api/clusters => [201] Created
+12. [GET] http://127.0.0.1:8765/api/clusters/c17d44ea61b79 => [200] OK
+13. [GET] http://127.0.0.1:8765/api/clusters/c17d44ea61b79/dashboard?range=1h => [200] OK
+14. [GET] http://127.0.0.1:8765/api/clusters/c17d44ea61b79 => [200] OK
+15. [GET] http://127.0.0.1:8765/api/clusters/c17d44ea61b79/dashboard?range=1h => [200] OK
+16. [GET] http://127.0.0.1:8765/api/clusters/c17d44ea61b79 => [200] OK
+17. [GET] http://127.0.0.1:8765/api/clusters/c17d44ea61b79/dashboard?range=1h => [200] OK
+18. [GET] http://127.0.0.1:8765/api/clusters/c17d44ea61b79 => [200] OK
+19. [GET] http://127.0.0.1:8765/api/clusters/c17d44ea61b79/dashboard?range=1h => [200] OK
+20. [GET] http://127.0.0.1:8765/api/clusters/c17d44ea61b79 => [200] OK
+21. [GET] http://127.0.0.1:8765/api/clusters/c17d44ea61b79/dashboard?range=1h => [200] OK
+22. [GET] http://127.0.0.1:8765/api/clusters/c17d44ea61b79 => [200] OK
+23. [GET] http://127.0.0.1:8765/api/clusters/c17d44ea61b79/dashboard?range=15m => [200] OK
+24. [GET] http://127.0.0.1:8765/api/clusters/c17d44ea61b79 => [200] OK
+25. [GET] http://127.0.0.1:8765/api/clusters/c17d44ea61b79/dashboard?range=15m => [200] OK
+26. [GET] http://127.0.0.1:8765/api/clusters/c17d44ea61b79 => [200] OK
+27. [GET] http://127.0.0.1:8765/api/clusters/c17d44ea61b79/dashboard?range=15m => [200] OK
+28. [GET] http://127.0.0.1:8765/api/clusters/c17d44ea61b79 => [200] OK
+29. [GET] http://127.0.0.1:8765/api/clusters/c17d44ea61b79/dashboard?range=15m&node=n79945e956cbd => [200] OK
+30. [GET] http://127.0.0.1:8765/api/clusters/c17d44ea61b79 => [200] OK
+31. [GET] http://127.0.0.1:8765/api/clusters/c17d44ea61b79/dashboard?range=15m&node=n79945e956cbd => [200] OK
+32. [GET] http://127.0.0.1:8765/api/clusters/c17d44ea61b79 => [200] OK
+33. [GET] http://127.0.0.1:8765/api/clusters/c17d44ea61b79/dashboard?range=15m&node=n79945e956cbd => [200] OK
+
+Note: 9 static requests not shown, run with "static" option to see them.

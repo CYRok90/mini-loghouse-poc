@@ -36,6 +36,8 @@
   }
 
   function render(data, health) {
+    document.getElementById("policy").textContent =
+      `수집 주기 ${health.refresh_seconds}초 · 마지막 성공 후 ${health.stale_after_seconds}초(주기×3 + flush 여유 ${health.safety_lag_seconds}초)가 지나면 '수집 지연'. 연결 성공·수집 성공·클러스터 상태는 서로 다릅니다.`;
     clear(listNode);
     if (!data.clusters.length) {
       listNode.append(el("div", { class: "empty" }, el("p", { text: "등록된 클러스터가 없습니다." }),
@@ -44,8 +46,6 @@
     }
     const head = el("tr", {}, ...["이름 / endpoint", "최근 연결 확인", "수집 상태", "마지막 성공 수집 (모든 노드·소스)", "노드 수집 범위", "최근 오류", ""].map((t) => el("th", { text: t })));
     listNode.append(el("table", {}, el("thead", {}, head), el("tbody", {}, data.clusters.map(row))));
-    document.getElementById("policy").textContent =
-      `수집 주기 ${health.refresh_seconds}초 · 마지막 성공 후 ${health.stale_after_seconds}초(주기×3 + flush 여유 ${health.safety_lag_seconds}초)가 지나면 '수집 지연'. 연결 성공·수집 성공·클러스터 상태는 서로 다릅니다.`;
   }
 
   async function load() {
