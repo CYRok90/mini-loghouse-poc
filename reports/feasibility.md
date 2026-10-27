@@ -1,6 +1,6 @@
 # chDB Mini LogHouse PoC — 기술타당성 보고서
 
-- 작성: 2026-10-27 · 대상 명세: `../mini-loghouse-poc-goal.md`
+- 작성: 2026-10-27~28 · 대상 명세: `../mini-loghouse-poc-goal.md`
 - 범위: 로컬(loopback) 단일 운영자 PoC. 외부 공개 가능한 제품이 아님.
 
 ## 1. 결론
@@ -102,6 +102,7 @@
 | 기간·노드 필터 → API 파라미터 변경, KPI 31→13, 표 a2만 | PASS | e2e-08, e2e-network-filters.txt |
 | 노드 a2 중단 → a2 `수집 오류` + 연속 실패 수, 클러스터 B 정상, 과거 차트 유지·stale 표시 | PASS | e2e-09, e2e-10 |
 | 중복 등록 → 409 안내, password 입력란 비움, DOM·URL·storage·cookie에 password 없음 | PASS | e2e-11 |
+| 기간 coverage: 24시간 범위의 수집 전 구간 → `부분 집계 (노드별 32%)`, 수집 완료 구간의 0건 → `실제 0` | PASS | e2e-12, e2e-13 |
 | 콘솔 | JS 예외 0. 리소스 오류는 의도한 테스트(백엔드 중단 중 자동 갱신, 삭제된 클러스터 404, 409)뿐 | e2e-console-all.log |
 
 E2E 중 발견해 고친 결함: `api()`가 body가 있어도 GET을 기본으로 써서 브라우저가 요청을 보내지 않음(httpx API 테스트로는 잡히지 않음), 정적 파일 캐시로 수정이 반영되지 않음(no-cache + 버전 쿼리), 빈 목록에서 정책 문구 미갱신, 축 눈금 반올림, 복구 모드에서 마지막 상태가 `수집 중`으로 보이던 문제.
