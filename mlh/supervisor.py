@@ -52,8 +52,9 @@ class Supervisor:
         while not self._stop.is_set():
             try:
                 self.tick(time.time())
-            except Exception:  # noqa: BLE001 - keep supervising; details stay in local log only
-                log.exception("supervisor tick failed")
+            except Exception as exc:  # noqa: BLE001 - keep supervising; raw text may contain SQL, log category only
+                info = classify_exception(exc)
+                log.error("supervisor tick failed: %s %s %s", type(exc).__name__, info.category, list(info.codes))
             self._stop.wait(self._settings.supervisor_poll_seconds)
 
     def tick(self, now: float) -> None:

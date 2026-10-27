@@ -1,6 +1,22 @@
 {
   "during_outage": {
-    "cluster-A (TLS)": {
+    "B": {
+      "cluster_state": "collecting",
+      "coverage": "전체 검증됨",
+      "nodes": {
+        "b1": {
+          "metrics": [
+            "collecting",
+            null
+          ],
+          "query_log": [
+            "collecting",
+            null
+          ]
+        }
+      }
+    },
+    "A": {
       "cluster_state": "error",
       "coverage": "전체 검증됨",
       "nodes": {
@@ -25,8 +41,47 @@
           ]
         }
       }
+    }
+  },
+  "dashboard_during_outage": {
+    "B": {
+      "status": 200,
+      "seconds": 0.055
     },
-    "cluster-B": {
+    "A": {
+      "status": 200,
+      "seconds": 0.032
+    }
+  },
+  "collected_while_a2_down": {
+    "prefix": "c3x1793133814-down",
+    "source_events": 12,
+    "dest_events": 12,
+    "missing_in_dest": [],
+    "extra_in_dest": [],
+    "dest_stats": {
+      "c17d44ea61b79": {
+        "raw_rows": 18,
+        "final_rows": 6,
+        "initial_queries": 3
+      },
+      "ceb26d8253e22": {
+        "raw_rows": 18,
+        "final_rows": 6,
+        "initial_queries": 3
+      }
+    },
+    "expected_initial_queries": 6,
+    "checks": {
+      "non_empty": true,
+      "multiset_equal": true,
+      "final_rows_equal_source": true,
+      "initial_queries_independent": true
+    },
+    "match": true
+  },
+  "after_recovery": {
+    "B": {
       "cluster_state": "collecting",
       "coverage": "전체 검증됨",
       "nodes": {
@@ -41,40 +96,8 @@
           ]
         }
       }
-    }
-  },
-  "dashboard_during_outage": {
-    "cluster-A (TLS)": {
-      "status": 200,
-      "seconds": 0.029
     },
-    "cluster-B": {
-      "status": 200,
-      "seconds": 0.026
-    }
-  },
-  "collected_while_a2_down": {
-    "prefix": "c3x1793106428-down",
-    "source_events": 12,
-    "dest_events": 12,
-    "missing_in_dest": [],
-    "extra_in_dest": [],
-    "dest_stats": {
-      "c5f40eca51dba": {
-        "raw_rows": 18,
-        "final_rows": 6,
-        "initial_queries": 3
-      },
-      "c706e6b6cc403": {
-        "raw_rows": 12,
-        "final_rows": 6,
-        "initial_queries": 3
-      }
-    },
-    "match": true
-  },
-  "after_recovery": {
-    "cluster-A (TLS)": {
+    "A": {
       "cluster_state": "collecting",
       "coverage": "전체 검증됨",
       "nodes": {
@@ -99,166 +122,157 @@
           ]
         }
       }
-    },
-    "cluster-B": {
-      "cluster_state": "collecting",
-      "coverage": "전체 검증됨",
-      "nodes": {
-        "b1": {
-          "metrics": [
-            "collecting",
-            null
-          ],
-          "query_log": [
-            "collecting",
-            null
-          ]
-        }
-      }
     }
   },
   "collected_after_recovery": {
-    "prefix": "c3x1793106428-up",
+    "prefix": "c3x1793133814-up",
     "source_events": 18,
     "dest_events": 18,
     "missing_in_dest": [],
     "extra_in_dest": [],
     "dest_stats": {
-      "c5f40eca51dba": {
-        "raw_rows": 30,
+      "c17d44ea61b79": {
+        "raw_rows": 18,
         "final_rows": 12,
         "initial_queries": 6
       },
-      "c706e6b6cc403": {
-        "raw_rows": 12,
+      "ceb26d8253e22": {
+        "raw_rows": 6,
         "final_rows": 6,
         "initial_queries": 3
       }
+    },
+    "expected_initial_queries": 9,
+    "checks": {
+      "non_empty": true,
+      "multiset_equal": true,
+      "final_rows_equal_source": true,
+      "initial_queries_independent": true
     },
     "match": true
   },
   "a_transitions": [
     {
-      "id": 22,
-      "node_id": "na20d5a1c1b97",
+      "id": 60,
+      "node_id": "n79945e956cbd",
       "source": "query_log",
       "from_state": "error",
       "to_state": "collecting",
       "detail": null,
-      "at": 1793106487.0333261
+      "at": 1793133876.3039
     },
     {
-      "id": 21,
-      "node_id": "na20d5a1c1b97",
+      "id": 59,
+      "node_id": "n79945e956cbd",
       "source": "metrics",
       "from_state": "error",
       "to_state": "collecting",
       "detail": null,
-      "at": 1793106487.033111
+      "at": 1793133876.303746
     },
     {
-      "id": 20,
-      "node_id": "na20d5a1c1b97",
+      "id": 58,
+      "node_id": "n79945e956cbd",
       "source": "query_log",
       "from_state": "collecting",
       "to_state": "error",
       "detail": "refused",
-      "at": 1793106430.665372
+      "at": 1793133821.974862
     },
     {
-      "id": 19,
-      "node_id": "na20d5a1c1b97",
+      "id": 57,
+      "node_id": "n79945e956cbd",
       "source": "metrics",
       "from_state": "collecting",
       "to_state": "error",
       "detail": "refused",
-      "at": 1793106430.665022
+      "at": 1793133821.974499
     },
     {
-      "id": 16,
-      "node_id": "na20d5a1c1b97",
+      "id": 56,
+      "node_id": "n79945e956cbd",
       "source": "query_log",
       "from_state": "delayed",
       "to_state": "collecting",
       "detail": null,
-      "at": 1793096065.2747252
+      "at": 1793133771.6030889
     },
     {
-      "id": 15,
-      "node_id": "na20d5a1c1b97",
+      "id": 55,
+      "node_id": "n79945e956cbd",
       "source": "metrics",
       "from_state": "delayed",
       "to_state": "collecting",
       "detail": null,
-      "at": 1793096065.274538
+      "at": 1793133771.603032
     },
     {
-      "id": 14,
-      "node_id": "n9bf19a0b04ce",
+      "id": 54,
+      "node_id": "na976f56792d5",
       "source": "query_log",
       "from_state": "delayed",
       "to_state": "collecting",
       "detail": null,
-      "at": 1793096065.2737348
+      "at": 1793133771.602819
     },
     {
-      "id": 13,
-      "node_id": "n9bf19a0b04ce",
+      "id": 53,
+      "node_id": "na976f56792d5",
       "source": "metrics",
       "from_state": "delayed",
       "to_state": "collecting",
       "detail": null,
-      "at": 1793096065.2731452
+      "at": 1793133771.6027362
     }
   ],
   "a_gaps": [
     {
-      "id": 2,
-      "node_id": "na20d5a1c1b97",
-      "lo": 1793094651,
-      "hi": 1793095251,
-      "next_lo": 1793095251,
-      "state": "backfilled",
-      "reason": "initial",
-      "attempts": 0,
-      "created_at": 1793095279.8021078,
-      "updated_at": 1793095285.973584
-    },
-    {
-      "id": 4,
-      "node_id": "n9bf19a0b04ce",
-      "lo": 1793096007,
-      "hi": 1793096038,
-      "next_lo": 1793096038,
+      "id": 14,
+      "node_id": "n79945e956cbd",
+      "lo": 1793133572,
+      "hi": 1793133578,
+      "next_lo": 1793133578,
       "state": "backfilled",
       "reason": "collection_interrupted",
       "attempts": 0,
-      "created_at": 1793096065.274011,
-      "updated_at": 1793096065.298673
+      "created_at": 1793133607.103101,
+      "updated_at": 1793133609.160206
     },
     {
-      "id": 5,
-      "node_id": "na20d5a1c1b97",
-      "lo": 1793096007,
-      "hi": 1793096038,
-      "next_lo": 1793096038,
+      "id": 16,
+      "node_id": "na976f56792d5",
+      "lo": 1793133697,
+      "hi": 1793133743,
+      "next_lo": 1793133743,
       "state": "backfilled",
       "reason": "collection_interrupted",
       "attempts": 0,
-      "created_at": 1793096065.274882,
-      "updated_at": 1793096067.340687
+      "created_at": 1793133771.602897,
+      "updated_at": 1793133773.649085
     },
     {
-      "id": 7,
-      "node_id": "na20d5a1c1b97",
-      "lo": 1793106417,
-      "hi": 1793106458,
-      "next_lo": 1793106458,
+      "id": 17,
+      "node_id": "n79945e956cbd",
+      "lo": 1793133697,
+      "hi": 1793133743,
+      "next_lo": 1793133743,
       "state": "backfilled",
       "reason": "collection_interrupted",
       "attempts": 0,
-      "created_at": 1793106487.033565,
-      "updated_at": 1793106487.06387
+      "created_at": 1793133771.60314,
+      "updated_at": 1793133775.697537
+    },
+    {
+      "id": 18,
+      "node_id": "n79945e956cbd",
+      "lo": 1793133792,
+      "hi": 1793133848,
+      "next_lo": 1793133848,
+      "state": "backfilled",
+      "reason": "collection_interrupted",
+      "attempts": 0,
+      "created_at": 1793133876.304081,
+      "updated_at": 1793133876.335896
     }
   ]
 }

@@ -52,13 +52,13 @@
 | R3 | source 노드 식별이 수집 앱 hostname으로 대체되지 않는다 | **PASS** | `displayName()`이 원격에서 평가(a1/a2/b1). 같은 머신의 `hostName()`은 세 노드·수집 앱이 모두 동일해 식별자로 쓰지 않음 |
 | R4 | NC를 지워도 chDB·MV는 로드되고, NC 재생성 시 RMV가 자동 재개된다 | **PASS** | refresh만 669로 실패, 재생성 후 6083→7742행 (`day0/nc_missing.log`) |
 | R5 | `APPEND INCREMENTAL`을 remote source에 쓸 수 있다 | **FAIL (26.9.2.1)** | `Code 36: Incremental refresh source must be a table, not a subquery or table function` (`phase_a2/append_incremental_remote.log`) |
-| C1 | 노드별 태그 쿼리의 source·destination 안정화 이벤트 집합이 일치한다 | **PASS** | 44/44, 누락·초과 0 (`phase_c/c1_reconciliation.json`) |
+| C1 | 노드별 태그 쿼리의 source·destination 안정화 이벤트 집합이 일치한다 | **PASS** | 44/44, 누락·초과 0. 리뷰 후 다중집합·FINAL 행 수·initial 수(21) 독립 검증까지 PASS (`phase_c/c1_reconciliation.json`) |
 | C2 | overlap 재조회의 raw 중복은 Dashboard 집계에서 제거된다 | **PASS** | prefix raw 64 → FINAL 32 (2배), 전체 raw 약 1.3~3배. 집계는 FINAL 뷰만 사용 |
 | C3 | 같은 query_id를 재사용한 서로 다른 쿼리가 합쳐지지 않는다 | **PASS** | reuse 2쿼리 × (Start, Finish) 4행 유지 |
 | C4 | 분산 쿼리의 논리 요청과 노드별 실행이 구분된다 | **PASS** | clusterAllReplicas: a1 initial 1건 + a2 `is_initial_query=0` 1건 |
 | C5 | backend 중단 중 발생한 이벤트가 재시작 후 복구된다 | **PASS (대안 경로)** | 45초 중단 → gap 31초 기록·backfill, 24/24 모두 `collect_path=backfill` (`c2_backend_restart.json`) |
 | C6 | 노드 1개 중단 시 다른 노드·클러스터 수집과 UI가 계속되고 복구 후 동작한다 | **PASS** | a2만 `refused` 오류, a1·B 계속, Dashboard 29ms 응답, 중단 중 12/12·복구 후 18/18, a2 gap 41초 backfill (`c3_node_failure.json`) |
-| C7 | 브라우저 없이 수집이 지속된다 | **PASS** | 브라우저 없이 3.14시간 연속 cursor 전진, 의도한 gap 2건 외 없음 (`c6_browserless_continuity.log`) |
+| C7 | 브라우저 없이 수집이 지속된다 | **PASS** | 3.14시간(`c6_browserless_continuity.log`)에 이어 밤사이 약 7.4시간 연속 수집, 의도한 gap 외 없음 (`c6_overnight_continuity.log`) |
 | C8 | 화면 갱신·여러 탭·두 번째 backend가 수집기를 중복 생성하지 않는다 | **PASS** | 2번째 인스턴스 `AlreadyRunning` exit 3, 40회 페이지/API 호출 후 RMV 목록 불변 (`c4_no_duplicates.json`) |
 | C9 | 재시작 후 등록·이력 유지, 자격증명 재입력 없이 재연결 | **PASS** | C5 재시작 후 `needs_credentials` 0건, 수집 재개 |
 | C10 | 키 누락·불일치 시 복구 모드로 뜨고, 키를 복원하면 재개된다 | **PASS** | missing/다른 키 → recovery(Dashboard 503, 등록 조회 가능), 복원 → normal·수집 (`recovery_mode.json`) |
@@ -152,3 +152,14 @@ E2E 중 발견해 고친 결함: `api()`가 body가 있어도 GET을 기본으�
 | P2-12 | Phase C가 set 비교라 중복 행을 놓치고 실패해도 exit 0 | mock 반례 | 다중집합 비교, FINAL 행 수·initial 수 독립 검증, 실패 시 exit 1 | 재실행 결과(11절) |
 
 Codex가 "중대 결함 없음"으로 본 영역: Dashboard dedup 집계, SQL injection/identifier, static JS XSS, 일반 API 응답의 password 노출.
+
+## 11. 리뷰 반영 후 재검증 (2026-10-28)
+
+| 검증 | 결과 | 근거 |
+|---|---|---|
+| 단위 테스트 | 55 PASS (리뷰 반례 회귀 테스트 포함) | `pytest` |
+| RMV 사양 마이그레이션 | 기존 3노드 RMV가 `spec None → v2`로 재생성되고 수집 지속 | `evidence/phase_c/backend-review.log` |
+| Phase C 전체 (강화된 판정: 다중집합·FINAL 행 수·initial 수 독립 계산, 실패 시 exit 1) | **RESULT: PASS, exit 0** — C1 44/44, C2 24/24(gap이 되감기 반영으로 46초), C3 장애 중 12/12·복구 후 18/18, C4 lock 거부·RMV 불변, C5 테스트 서버 경로까지 평문 0 | `evidence/phase_c/run-after-review.log`, `c1~c5*.json` |
+| 복구 모드 재검증 | 키 누락·불일치 시 상태가 `error`(복구 모드)로 표시되고 Dashboard 503, 키 복원 시 재개 | `recovery_mode.json` |
+| 무브라우저 장기 수집 | 2026-10-27 22:16 → 10-28 05:41, **약 7.4시간 연속**. gap은 의도한 노드 중단·재기동 2건뿐이고 모두 backfill됨 | `c6_overnight_continuity.log` |
+| 기간 coverage UI | 24시간 범위에서 `부분 집계 (노드별 32/32%)` 표시, 수집 시작 전 구간은 `수집 전` 음영 | `evidence/e2e/e2e-12-a-24h-partial-coverage.png` |

@@ -1,27 +1,50 @@
 {
-  "prefix": "c2x1793096017",
+  "prefix": "c2x1793133724",
   "source_events": 24,
   "dest_events": 24,
   "missing_in_dest": [],
   "extra_in_dest": [],
   "dest_stats": {
-    "c5f40eca51dba": {
+    "c17d44ea61b79": {
       "raw_rows": 16,
       "final_rows": 16,
       "initial_queries": 8
     },
-    "c706e6b6cc403": {
+    "ceb26d8253e22": {
       "raw_rows": 8,
       "final_rows": 8,
       "initial_queries": 4
     }
+  },
+  "expected_initial_queries": 12,
+  "checks": {
+    "non_empty": true,
+    "multiset_equal": true,
+    "final_rows_equal_source": true,
+    "initial_queries_independent": true
   },
   "match": true,
   "backend_stop_seconds": 0.2,
   "downtime_seconds": 45,
   "registry_preserved": true,
   "states_after": {
-    "cluster-A (TLS)": {
+    "B": {
+      "cluster_state": "collecting",
+      "coverage": "전체 검증됨",
+      "nodes": {
+        "b1": {
+          "metrics": [
+            "collecting",
+            null
+          ],
+          "query_log": [
+            "collecting",
+            null
+          ]
+        }
+      }
+    },
+    "A": {
       "cluster_state": "collecting",
       "coverage": "전체 검증됨",
       "nodes": {
@@ -46,63 +69,71 @@
           ]
         }
       }
-    },
-    "cluster-B": {
-      "cluster_state": "collecting",
-      "coverage": "전체 검증됨",
-      "nodes": {
-        "b1": {
-          "metrics": [
-            "collecting",
-            null
-          ],
-          "query_log": [
-            "collecting",
-            null
-          ]
-        }
-      }
     }
   },
   "gaps": {
-    "c5f40eca51dba": [
+    "c17d44ea61b79": [
       {
-        "id": 4,
-        "node_id": "n9bf19a0b04ce",
-        "lo": 1793096007,
-        "hi": 1793096038,
-        "next_lo": 1793096038,
+        "id": 14,
+        "node_id": "n79945e956cbd",
+        "lo": 1793133572,
+        "hi": 1793133578,
+        "next_lo": 1793133578,
         "state": "backfilled",
         "reason": "collection_interrupted",
         "attempts": 0,
-        "created_at": 1793096065.274011,
-        "updated_at": 1793096065.298673
+        "created_at": 1793133607.103101,
+        "updated_at": 1793133609.160206
       },
       {
-        "id": 5,
-        "node_id": "na20d5a1c1b97",
-        "lo": 1793096007,
-        "hi": 1793096038,
-        "next_lo": 1793096038,
+        "id": 16,
+        "node_id": "na976f56792d5",
+        "lo": 1793133697,
+        "hi": 1793133743,
+        "next_lo": 1793133743,
         "state": "backfilled",
         "reason": "collection_interrupted",
         "attempts": 0,
-        "created_at": 1793096065.274882,
-        "updated_at": 1793096067.340687
+        "created_at": 1793133771.602897,
+        "updated_at": 1793133773.649085
+      },
+      {
+        "id": 17,
+        "node_id": "n79945e956cbd",
+        "lo": 1793133697,
+        "hi": 1793133743,
+        "next_lo": 1793133743,
+        "state": "backfilled",
+        "reason": "collection_interrupted",
+        "attempts": 0,
+        "created_at": 1793133771.60314,
+        "updated_at": 1793133775.697537
       }
     ],
-    "c706e6b6cc403": [
+    "ceb26d8253e22": [
       {
-        "id": 6,
-        "node_id": "nbc24d126b852",
-        "lo": 1793096007,
-        "hi": 1793096038,
-        "next_lo": 1793096038,
+        "id": 12,
+        "node_id": "n2d1a6b3ba106",
+        "lo": 1793133572,
+        "hi": 1793133578,
+        "next_lo": 1793133578,
         "state": "backfilled",
         "reason": "collection_interrupted",
         "attempts": 0,
-        "created_at": 1793096065.275499,
-        "updated_at": 1793096069.383512
+        "created_at": 1793133605.073474,
+        "updated_at": 1793133605.0861068
+      },
+      {
+        "id": 15,
+        "node_id": "n2d1a6b3ba106",
+        "lo": 1793133697,
+        "hi": 1793133743,
+        "next_lo": 1793133743,
+        "state": "backfilled",
+        "reason": "collection_interrupted",
+        "attempts": 0,
+        "created_at": 1793133771.6025338,
+        "updated_at": 1793133771.614624
       }
     ]
   },

@@ -7,27 +7,27 @@
   ],
   "original_still_serving": true,
   "views_before": {
-    "cluster-A (TLS)": [
-      "mv_m_n9bf19a0b04ce",
-      "mv_m_na20d5a1c1b97",
-      "mv_q_n9bf19a0b04ce",
-      "mv_q_na20d5a1c1b97"
+    "B": [
+      "mv_m_n2d1a6b3ba106",
+      "mv_q_n2d1a6b3ba106"
     ],
-    "cluster-B": [
-      "mv_m_nbc24d126b852",
-      "mv_q_nbc24d126b852"
+    "A": [
+      "mv_m_n79945e956cbd",
+      "mv_m_na976f56792d5",
+      "mv_q_n79945e956cbd",
+      "mv_q_na976f56792d5"
     ]
   },
   "views_after": {
-    "cluster-A (TLS)": [
-      "mv_m_n9bf19a0b04ce",
-      "mv_m_na20d5a1c1b97",
-      "mv_q_n9bf19a0b04ce",
-      "mv_q_na20d5a1c1b97"
+    "B": [
+      "mv_m_n2d1a6b3ba106",
+      "mv_q_n2d1a6b3ba106"
     ],
-    "cluster-B": [
-      "mv_m_nbc24d126b852",
-      "mv_q_nbc24d126b852"
+    "A": [
+      "mv_m_n79945e956cbd",
+      "mv_m_na976f56792d5",
+      "mv_q_n79945e956cbd",
+      "mv_q_na976f56792d5"
     ]
   },
   "views_unchanged": true

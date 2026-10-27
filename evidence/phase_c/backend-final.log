@@ -1,0 +1,51 @@
+INFO:     Started server process [51473]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8765 (Press CTRL+C to quit)
+INFO:     127.0.0.1:55303 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55304 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55316 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55317 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55339 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55340 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55358 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55359 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55384 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55385 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55385 - "GET /clusters/c17d44ea61b79?range=24h HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55385 - "GET /static/app.css?v=6 HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:55384 - "GET /static/common.js?v=6 HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:55392 - "GET /static/chart.js?v=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55393 - "GET /static/cluster.js?v=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55393 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55392 - "GET /api/clusters/c17d44ea61b79/dashboard?range=24h HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55406 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55407 - "GET /api/clusters/c17d44ea61b79/dashboard?range=24h HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55420 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55421 - "GET /api/clusters/c17d44ea61b79/dashboard?range=24h HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55434 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55435 - "GET /api/clusters/c17d44ea61b79/dashboard?range=24h HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55449 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55450 - "GET /api/clusters/c17d44ea61b79/dashboard?range=24h HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55463 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55464 - "GET /api/clusters/c17d44ea61b79/dashboard?range=24h HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55478 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55479 - "GET /api/clusters/c17d44ea61b79/dashboard?range=24h HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55480 - "GET /api/clusters/ceb26d8253e22/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55493 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55494 - "GET /api/clusters/c17d44ea61b79/dashboard?range=24h HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55507 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55508 - "GET /api/clusters/c17d44ea61b79/dashboard?range=24h HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55509 - "GET /api/clusters/ceb26d8253e22/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55522 - "GET /api/clusters/c17d44ea61b79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55523 - "GET /api/clusters/c17d44ea61b79/dashboard?range=24h HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [51473]
+INFO:     Started server process [53010]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8765 (Press CTRL+C to quit)
+INFO:     127.0.0.1:55544 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55545 - "GET /api/health HTTP/1.1" 200 OK

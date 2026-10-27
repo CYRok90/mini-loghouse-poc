@@ -140,6 +140,11 @@ def _cluster_or_404(rt: Runtime, cluster_id: str) -> dict[str, Any]:
 
 
 def _api(app: FastAPI, settings: Settings) -> None:
+    _api_read(app, settings)
+    _api_write(app, settings)
+
+
+def _api_read(app: FastAPI, settings: Settings) -> None:
     @app.get("/api/health")
     async def health() -> dict:
         rt = _rt(app)
@@ -149,25 +154,6 @@ def _api(app: FastAPI, settings: Settings) -> None:
             "safety_lag_seconds": settings.safety_lag_seconds, "overlap_seconds": settings.overlap_seconds,
             "credential_policy": "encrypted_named_collection",
         }
-
-    @app.post("/api/probe")
-    async def probe(body: ProbeBody) -> dict:
-        _require_owner(_rt(app))
-        candidates = [c.model_dump() for c in body.candidates] if body.candidates is not None else None
-        result = await run_in_threadpool(run_probe, settings, endpoint_payload(body), candidates)
-        return summarize(result)
-
-    @app.post("/api/clusters", status_code=201)
-    async def create_cluster(body: RegisterRequest) -> JSONResponse:
-        rt = _rt(app)
-        owner = _require_owner(rt)
-        async with app.state.register_lock:  # double-click / resend cannot race the unique checks
-            try:
-                cluster_id = await run_in_threadpool(register, owner, rt.registry, settings, body)
-            except RegistrationError as exc:
-                body_ = security.error_body(exc.category, exc.message, probe=exc.detail)
-                return JSONResponse(body_, status_code=exc.status)
-        return JSONResponse({"id": cluster_id}, status_code=201)
 
     @app.get("/api/clusters")
     async def list_clusters() -> dict:
@@ -199,6 +185,27 @@ def _api(app: FastAPI, settings: Settings) -> None:
         owner = _require_owner(rt)
         cluster = _cluster_or_404(rt, cluster_id)
         return await run_in_threadpool(dashboard.diagnostics, owner, rt.registry, cluster, prefix)
+
+
+def _api_write(app: FastAPI, settings: Settings) -> None:
+    @app.post("/api/probe")
+    async def probe(body: ProbeBody) -> dict:
+        _require_owner(_rt(app))
+        candidates = [c.model_dump() for c in body.candidates] if body.candidates is not None else None
+        result = await run_in_threadpool(run_probe, settings, endpoint_payload(body), candidates)
+        return summarize(result)
+
+    @app.post("/api/clusters", status_code=201)
+    async def create_cluster(body: RegisterRequest) -> JSONResponse:
+        rt = _rt(app)
+        owner = _require_owner(rt)
+        async with app.state.register_lock:  # double-click / resend cannot race the unique checks
+            try:
+                cluster_id = await run_in_threadpool(register, owner, rt.registry, settings, body)
+            except RegistrationError as exc:
+                body_ = security.error_body(exc.category, exc.message, probe=exc.detail)
+                return JSONResponse(body_, status_code=exc.status)
+        return JSONResponse({"id": cluster_id}, status_code=201)
 
     @app.delete("/api/clusters/{cluster_id}")
     async def delete_cluster(cluster_id: str) -> dict:
