@@ -1,0 +1,84 @@
+{
+  "prefix": "c1x1793095952",
+  "source_events": 44,
+  "dest_events": 44,
+  "missing_in_dest": [],
+  "extra_in_dest": [],
+  "dest_stats": {
+    "c5f40eca51dba": {
+      "raw_rows": 64,
+      "final_rows": 32,
+      "initial_queries": 15
+    },
+    "c706e6b6cc403": {
+      "raw_rows": 36,
+      "final_rows": 12,
+      "initial_queries": 6
+    }
+  },
+  "match": true,
+  "query_id_reuse_events": [
+    [
+      "c1x1793095952-reuse",
+      "QueryStart"
+    ],
+    [
+      "c1x1793095952-reuse",
+      "QueryFinish"
+    ],
+    [
+      "c1x1793095952-reuse",
+      "QueryStart"
+    ],
+    [
+      "c1x1793095952-reuse",
+      "QueryFinish"
+    ]
+  ],
+  "distributed_events": [
+    [
+      "a1",
+      "QueryStart",
+      1
+    ],
+    [
+      "a2",
+      "QueryStart",
+      0
+    ],
+    [
+      "a2",
+      "QueryFinish",
+      0
+    ],
+    [
+      "a1",
+      "QueryFinish",
+      1
+    ]
+  ],
+  "raw_vs_final_all": {
+    "c5f40eca51dba": [
+      {
+        "node_id": "n9bf19a0b04ce",
+        "collect_path": "rmv",
+        "raw_rows": 70,
+        "distinct_events": 52
+      },
+      {
+        "node_id": "na20d5a1c1b97",
+        "collect_path": "rmv",
+        "raw_rows": 62,
+        "distinct_events": 48
+      }
+    ],
+    "c706e6b6cc403": [
+      {
+        "node_id": "nbc24d126b852",
+        "collect_path": "rmv",
+        "raw_rows": 70,
+        "distinct_events": 46
+      }
+    ]
+  }
+}

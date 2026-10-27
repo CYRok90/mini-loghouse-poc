@@ -1,0 +1,264 @@
+{
+  "during_outage": {
+    "cluster-A (TLS)": {
+      "cluster_state": "error",
+      "coverage": "전체 검증됨",
+      "nodes": {
+        "a1": {
+          "metrics": [
+            "collecting",
+            null
+          ],
+          "query_log": [
+            "collecting",
+            null
+          ]
+        },
+        "a2": {
+          "metrics": [
+            "error",
+            "refused"
+          ],
+          "query_log": [
+            "error",
+            "refused"
+          ]
+        }
+      }
+    },
+    "cluster-B": {
+      "cluster_state": "collecting",
+      "coverage": "전체 검증됨",
+      "nodes": {
+        "b1": {
+          "metrics": [
+            "collecting",
+            null
+          ],
+          "query_log": [
+            "collecting",
+            null
+          ]
+        }
+      }
+    }
+  },
+  "dashboard_during_outage": {
+    "cluster-A (TLS)": {
+      "status": 200,
+      "seconds": 0.029
+    },
+    "cluster-B": {
+      "status": 200,
+      "seconds": 0.026
+    }
+  },
+  "collected_while_a2_down": {
+    "prefix": "c3x1793106428-down",
+    "source_events": 12,
+    "dest_events": 12,
+    "missing_in_dest": [],
+    "extra_in_dest": [],
+    "dest_stats": {
+      "c5f40eca51dba": {
+        "raw_rows": 18,
+        "final_rows": 6,
+        "initial_queries": 3
+      },
+      "c706e6b6cc403": {
+        "raw_rows": 12,
+        "final_rows": 6,
+        "initial_queries": 3
+      }
+    },
+    "match": true
+  },
+  "after_recovery": {
+    "cluster-A (TLS)": {
+      "cluster_state": "collecting",
+      "coverage": "전체 검증됨",
+      "nodes": {
+        "a1": {
+          "metrics": [
+            "collecting",
+            null
+          ],
+          "query_log": [
+            "collecting",
+            null
+          ]
+        },
+        "a2": {
+          "metrics": [
+            "collecting",
+            null
+          ],
+          "query_log": [
+            "collecting",
+            null
+          ]
+        }
+      }
+    },
+    "cluster-B": {
+      "cluster_state": "collecting",
+      "coverage": "전체 검증됨",
+      "nodes": {
+        "b1": {
+          "metrics": [
+            "collecting",
+            null
+          ],
+          "query_log": [
+            "collecting",
+            null
+          ]
+        }
+      }
+    }
+  },
+  "collected_after_recovery": {
+    "prefix": "c3x1793106428-up",
+    "source_events": 18,
+    "dest_events": 18,
+    "missing_in_dest": [],
+    "extra_in_dest": [],
+    "dest_stats": {
+      "c5f40eca51dba": {
+        "raw_rows": 30,
+        "final_rows": 12,
+        "initial_queries": 6
+      },
+      "c706e6b6cc403": {
+        "raw_rows": 12,
+        "final_rows": 6,
+        "initial_queries": 3
+      }
+    },
+    "match": true
+  },
+  "a_transitions": [
+    {
+      "id": 22,
+      "node_id": "na20d5a1c1b97",
+      "source": "query_log",
+      "from_state": "error",
+      "to_state": "collecting",
+      "detail": null,
+      "at": 1793106487.0333261
+    },
+    {
+      "id": 21,
+      "node_id": "na20d5a1c1b97",
+      "source": "metrics",
+      "from_state": "error",
+      "to_state": "collecting",
+      "detail": null,
+      "at": 1793106487.033111
+    },
+    {
+      "id": 20,
+      "node_id": "na20d5a1c1b97",
+      "source": "query_log",
+      "from_state": "collecting",
+      "to_state": "error",
+      "detail": "refused",
+      "at": 1793106430.665372
+    },
+    {
+      "id": 19,
+      "node_id": "na20d5a1c1b97",
+      "source": "metrics",
+      "from_state": "collecting",
+      "to_state": "error",
+      "detail": "refused",
+      "at": 1793106430.665022
+    },
+    {
+      "id": 16,
+      "node_id": "na20d5a1c1b97",
+      "source": "query_log",
+      "from_state": "delayed",
+      "to_state": "collecting",
+      "detail": null,
+      "at": 1793096065.2747252
+    },
+    {
+      "id": 15,
+      "node_id": "na20d5a1c1b97",
+      "source": "metrics",
+      "from_state": "delayed",
+      "to_state": "collecting",
+      "detail": null,
+      "at": 1793096065.274538
+    },
+    {
+      "id": 14,
+      "node_id": "n9bf19a0b04ce",
+      "source": "query_log",
+      "from_state": "delayed",
+      "to_state": "collecting",
+      "detail": null,
+      "at": 1793096065.2737348
+    },
+    {
+      "id": 13,
+      "node_id": "n9bf19a0b04ce",
+      "source": "metrics",
+      "from_state": "delayed",
+      "to_state": "collecting",
+      "detail": null,
+      "at": 1793096065.2731452
+    }
+  ],
+  "a_gaps": [
+    {
+      "id": 2,
+      "node_id": "na20d5a1c1b97",
+      "lo": 1793094651,
+      "hi": 1793095251,
+      "next_lo": 1793095251,
+      "state": "backfilled",
+      "reason": "initial",
+      "attempts": 0,
+      "created_at": 1793095279.8021078,
+      "updated_at": 1793095285.973584
+    },
+    {
+      "id": 4,
+      "node_id": "n9bf19a0b04ce",
+      "lo": 1793096007,
+      "hi": 1793096038,
+      "next_lo": 1793096038,
+      "state": "backfilled",
+      "reason": "collection_interrupted",
+      "attempts": 0,
+      "created_at": 1793096065.274011,
+      "updated_at": 1793096065.298673
+    },
+    {
+      "id": 5,
+      "node_id": "na20d5a1c1b97",
+      "lo": 1793096007,
+      "hi": 1793096038,
+      "next_lo": 1793096038,
+      "state": "backfilled",
+      "reason": "collection_interrupted",
+      "attempts": 0,
+      "created_at": 1793096065.274882,
+      "updated_at": 1793096067.340687
+    },
+    {
+      "id": 7,
+      "node_id": "na20d5a1c1b97",
+      "lo": 1793106417,
+      "hi": 1793106458,
+      "next_lo": 1793106458,
+      "state": "backfilled",
+      "reason": "collection_interrupted",
+      "attempts": 0,
+      "created_at": 1793106487.033565,
+      "updated_at": 1793106487.06387
+    }
+  ]
+}

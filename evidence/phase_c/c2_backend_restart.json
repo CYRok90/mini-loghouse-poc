@@ -1,0 +1,110 @@
+{
+  "prefix": "c2x1793096017",
+  "source_events": 24,
+  "dest_events": 24,
+  "missing_in_dest": [],
+  "extra_in_dest": [],
+  "dest_stats": {
+    "c5f40eca51dba": {
+      "raw_rows": 16,
+      "final_rows": 16,
+      "initial_queries": 8
+    },
+    "c706e6b6cc403": {
+      "raw_rows": 8,
+      "final_rows": 8,
+      "initial_queries": 4
+    }
+  },
+  "match": true,
+  "backend_stop_seconds": 0.2,
+  "downtime_seconds": 45,
+  "registry_preserved": true,
+  "states_after": {
+    "cluster-A (TLS)": {
+      "cluster_state": "collecting",
+      "coverage": "전체 검증됨",
+      "nodes": {
+        "a1": {
+          "metrics": [
+            "collecting",
+            null
+          ],
+          "query_log": [
+            "collecting",
+            null
+          ]
+        },
+        "a2": {
+          "metrics": [
+            "collecting",
+            null
+          ],
+          "query_log": [
+            "collecting",
+            null
+          ]
+        }
+      }
+    },
+    "cluster-B": {
+      "cluster_state": "collecting",
+      "coverage": "전체 검증됨",
+      "nodes": {
+        "b1": {
+          "metrics": [
+            "collecting",
+            null
+          ],
+          "query_log": [
+            "collecting",
+            null
+          ]
+        }
+      }
+    }
+  },
+  "gaps": {
+    "c5f40eca51dba": [
+      {
+        "id": 4,
+        "node_id": "n9bf19a0b04ce",
+        "lo": 1793096007,
+        "hi": 1793096038,
+        "next_lo": 1793096038,
+        "state": "backfilled",
+        "reason": "collection_interrupted",
+        "attempts": 0,
+        "created_at": 1793096065.274011,
+        "updated_at": 1793096065.298673
+      },
+      {
+        "id": 5,
+        "node_id": "na20d5a1c1b97",
+        "lo": 1793096007,
+        "hi": 1793096038,
+        "next_lo": 1793096038,
+        "state": "backfilled",
+        "reason": "collection_interrupted",
+        "attempts": 0,
+        "created_at": 1793096065.274882,
+        "updated_at": 1793096067.340687
+      }
+    ],
+    "c706e6b6cc403": [
+      {
+        "id": 6,
+        "node_id": "nbc24d126b852",
+        "lo": 1793096007,
+        "hi": 1793096038,
+        "next_lo": 1793096038,
+        "state": "backfilled",
+        "reason": "collection_interrupted",
+        "attempts": 0,
+        "created_at": 1793096065.275499,
+        "updated_at": 1793096069.383512
+      }
+    ]
+  },
+  "credential_reentry_needed": false
+}

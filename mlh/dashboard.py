@@ -186,3 +186,37 @@ def dashboard(owner: ChdbOwner, registry: Registry, settings: Settings, cluster:
         "coverage": _coverage(registry, node_ids),
         "safety_lag_seconds": settings.safety_lag_seconds,
     }
+
+
+# --------------------------------------------------------------------------- diagnostics
+def diagnostics(owner: ChdbOwner, registry: Registry, cluster: dict, prefix: str | None) -> dict[str, Any]:
+    """Raw vs deduplicated counts, collection objects and (optionally) the event set for a query_id prefix."""
+    params: dict[str, Any] = {"cid": cluster["id"]}
+    per_node = owner.rows(
+        "SELECT node_id, collect_path, count() AS raw_rows, uniqExact(event_time_microseconds, type, query_id,"
+        " query_start_time_microseconds) AS distinct_events FROM telemetry.query_log_raw"
+        " WHERE cluster_id = {cid:String} GROUP BY node_id, collect_path ORDER BY node_id, collect_path" + _LIMITS, params)
+    mvs = owner.rows("SELECT name FROM system.tables WHERE database = 'telemetry' AND engine = 'MaterializedView'"
+                     " AND (name LIKE 'mv_m_%' OR name LIKE 'mv_q_%') ORDER BY name" + _LIMITS)
+    node_ids = {n["id"] for n in registry.nodes(cluster["id"])}
+    out: dict[str, Any] = {
+        "per_node": per_node,
+        "collection_views": [m["name"] for m in mvs if m["name"][5:] in node_ids],
+        "cursors": {nid: registry.cursor(nid) for nid in node_ids},
+        "gaps": registry.gaps(sorted(node_ids)),
+    }
+    if prefix:
+        p = {**params, "prefix": prefix}
+        cond = (" WHERE cluster_id = {cid:String} AND (startsWith(query_id, {prefix:String})"
+                " OR startsWith(initial_query_id, {prefix:String}))")
+        out["prefix"] = {
+            "raw_rows": owner.rows("SELECT count() AS c FROM telemetry.query_log_raw" + cond + _LIMITS, p)[0]["c"],
+            "final_rows": owner.rows("SELECT count() AS c FROM telemetry.query_log_v" + cond + _LIMITS, p)[0]["c"],
+            "initial_queries": owner.rows("SELECT countIf(is_initial_query = 1 AND type != 'QueryStart') AS c"
+                                          " FROM telemetry.query_log_v" + cond + _LIMITS, p)[0]["c"],
+            "events": owner.rows(
+                "SELECT source_display_name AS node, query_id, type, toUnixTimestamp64Micro(event_time_microseconds) AS t,"
+                " is_initial_query, collect_path"
+                " FROM telemetry.query_log_v" + cond + " ORDER BY t LIMIT 5000" + _LIMITS, p),
+        }
+    return out

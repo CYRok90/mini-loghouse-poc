@@ -307,3 +307,27 @@ INFO:     127.0.0.1:55020 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
 INFO:     127.0.0.1:55021 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
 INFO:     127.0.0.1:55034 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
 INFO:     127.0.0.1:55035 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55048 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55049 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55062 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55063 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55076 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55077 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55090 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55091 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55104 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55105 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55118 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55119 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55132 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55133 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55146 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55147 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55160 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55161 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55174 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55175 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [80175]

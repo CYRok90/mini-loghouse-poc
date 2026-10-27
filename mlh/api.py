@@ -177,6 +177,13 @@ def _api(app: FastAPI, settings: Settings) -> None:
             raise HTTPException(400, detail="unknown node")
         return await run_in_threadpool(dashboard.dashboard, owner, rt.registry, settings, cluster, range, node)
 
+    @app.get("/api/clusters/{cluster_id}/diagnostics")
+    async def get_diagnostics(cluster_id: str, prefix: str | None = Query(None, pattern=r"^[A-Za-z0-9_\-]{1,64}$")) -> dict:
+        rt = _rt(app)
+        owner = _require_owner(rt)
+        cluster = _cluster_or_404(rt, cluster_id)
+        return await run_in_threadpool(dashboard.diagnostics, owner, rt.registry, cluster, prefix)
+
     @app.delete("/api/clusters/{cluster_id}")
     async def delete_cluster(cluster_id: str) -> dict:
         rt = _rt(app)

@@ -1,0 +1,33 @@
+INFO:     Started server process [84593]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8765 (Press CTRL+C to quit)
+INFO:     127.0.0.1:55184 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55185 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55214 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55215 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55228 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55229 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55242 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55243 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55250 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55257 - "GET /api/clusters/c5f40eca51dba/diagnostics?prefix=c1x1793095952 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55258 - "GET /api/clusters/c706e6b6cc403/diagnostics?prefix=c1x1793095952 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55259 - "GET /api/clusters/c5f40eca51dba/diagnostics?prefix=c1x1793095952-reuse HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55260 - "GET /api/clusters/c5f40eca51dba/diagnostics?prefix=c1x1793095952-dist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55261 - "GET /api/clusters/c5f40eca51dba/diagnostics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55262 - "GET /api/clusters/c706e6b6cc403/diagnostics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55269 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55270 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55283 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55284 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55285 - "GET /api/clusters/c5f40eca51dba/diagnostics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55298 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55299 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55312 - "GET /api/clusters/c5f40eca51dba HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55313 - "GET /api/clusters/c5f40eca51dba/dashboard?range=15m HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55314 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [84593]

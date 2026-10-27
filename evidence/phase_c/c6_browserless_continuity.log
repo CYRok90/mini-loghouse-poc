@@ -1,0 +1,6 @@
+views_unchanged True
+n9bf19a0b04ce covered 19:00:51 -> 22:09:17 (3.14 h) gaps: [('19:13:27', '19:13:58', 'backfilled')]
+na20d5a1c1b97 covered 19:00:51 -> 22:09:17 (3.14 h) gaps: [('19:13:27', '19:13:58', 'backfilled'), ('22:06:57', '22:07:38', 'backfilled')]
+nbc24d126b852 covered 19:00:51 -> 22:09:17 (3.14 h) gaps: [('19:13:27', '19:13:58', 'backfilled')]
+24h buckets with queries 2
+metric buckets 7 span h 3.0
