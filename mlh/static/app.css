@@ -147,3 +147,4 @@ td.num, td.mono { white-space: nowrap; }
 #table table { font-size: 13px; }
 #result ul { list-style: none; padding-left: 4px; }
 th { white-space: nowrap; }
+button.danger { border-color: var(--status-critical); color: var(--status-critical); }

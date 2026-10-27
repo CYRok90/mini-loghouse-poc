@@ -96,11 +96,17 @@ const MLH = (() => {
     return el("span", { class: `badge state-${state}` }, el("span", { class: "badge-icon", "aria-hidden": "true", text: STATE_ICON[state] || "?" }), label);
   }
 
+  // Connection result (separate from collection result): ok / failed / unknown.
+  const CONN = { ok: ["check-ok", "연결 정상"], failed: ["check-fail", "연결 실패"], unknown: ["check-skip", "연결 미확인"] };
+  function connLabel(check) {
+    return CONN[check.state] || CONN.unknown;
+  }
+
   function errorText(error) {
     if (!error) return "";
     const codes = error.codes && error.codes.length ? ` (code ${error.codes.join(", ")})` : "";
     return `${error.message}${codes}`;
   }
 
-  return { api, el, clear, tzLabel, fmtTime, fmtAge, fmtNum, fmtBytes, stateBadge, errorText };
+  return { api, el, clear, tzLabel, fmtTime, fmtAge, fmtNum, fmtBytes, stateBadge, errorText, connLabel };
 })();

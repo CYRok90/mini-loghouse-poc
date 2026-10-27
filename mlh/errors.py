@@ -55,11 +55,48 @@ _RULES: tuple[tuple[str, re.Pattern[str], str], ...] = (
 )
 
 
+# Wrapper codes that only say "all attempts failed"; the cause is the innermost other code.
+_WRAPPERS = frozenset({519, 279})
+# Codes whose meaning does not depend on message text (user data in the text is ignored).
+_BY_CODE = {
+    516: "auth", 497: "access_denied", 60: "table_missing", 47: "column_missing", 669: "nc_missing",
+    198: "dns", 209: "timeout", 159: "timeout",
+}
+# Network codes whose cause is only in the server/OS-generated text (refused vs SSL, packet byte).
+_TEXT_CODES = frozenset({210, 102, 1000})
+_SEGMENT_RE = re.compile(r"Code: (\d+)\.(.*?)(?=Code: \d+\.|$)", re.S)
+# Server-generated phrases without a code (e.g. remote() structure lookup).
+_NO_CODE_RULES = (("table_missing", re.compile(r"There is no table `[^`]*`\.`[^`]*` on server")),)
+_MESSAGES = {category: message for category, _, message in _RULES}
+
+
+def _info(category: str, codes: tuple[int, ...]) -> ErrorInfo:
+    return ErrorInfo(category, _MESSAGES[category], codes)
+
+
 def classify(raw: str) -> ErrorInfo:
-    codes = tuple(dict.fromkeys(int(c) for c in _CODE_RE.findall(raw)))
-    for category, pattern, message in _RULES:
+    """Classify by the innermost real ClickHouse error code first.
+
+    Message patterns are only applied to that code's own segment (for codes such
+    as 210/102 whose meaning is in the server-generated text). Text elsewhere -
+    usernames, SQL, hostnames - can never select a category.
+    """
+    segments = [(int(c), body) for c, body in _SEGMENT_RE.findall(raw)]
+    codes = tuple(dict.fromkeys(c for c, _ in segments))
+    inner = [(c, body) for c, body in segments if c not in _WRAPPERS]
+    if inner:
+        code, body = inner[-1]
+        if code in _BY_CODE:
+            return _info(_BY_CODE[code], codes)
+        if code not in _TEXT_CODES:
+            return ErrorInfo("unclassified", "원인을 분류할 수 없는 오류입니다 (미분류).", codes)
+        for category, pattern, _ in _RULES:
+            if pattern.search(f"Code: {code}.{body}"):
+                return _info(category, codes)
+        return ErrorInfo("unclassified", "원인을 분류할 수 없는 오류입니다 (미분류).", codes)
+    for category, pattern in _NO_CODE_RULES:
         if pattern.search(raw):
-            return ErrorInfo(category, message, codes)
+            return _info(category, codes)
     return ErrorInfo("unclassified", "원인을 분류할 수 없는 오류입니다 (미분류).", codes)
 
 
@@ -69,3 +106,8 @@ def classify_exception(exc: BaseException) -> ErrorInfo:
 
 # Categories meaning "the endpoint answered as ClickHouse and authenticated".
 CONNECTED_CATEGORIES = frozenset({"access_denied", "table_missing", "column_missing"})
+# Categories that mean the endpoint could not be reached / authenticated (connection check failed).
+CONNECTION_FAILURES = frozenset({
+    "dns", "refused", "timeout", "network", "tls_not_tls_endpoint", "tls_verify", "tls_handshake",
+    "http_endpoint", "tls_endpoint_plain_client", "protocol", "auth",
+})

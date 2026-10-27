@@ -1,0 +1,66 @@
+{
+  "steps": [
+    {
+      "label": "1 registered",
+      "mode": "normal",
+      "recovery_reason": null,
+      "clusters": [
+        [
+          "recovery-b",
+          "collecting",
+          [
+            "active"
+          ]
+        ]
+      ],
+      "dashboard_status": 200,
+      "register_status": 201
+    },
+    {
+      "label": "2 key file missing",
+      "mode": "recovery",
+      "recovery_reason": "암호화 키 문제: key file is missing",
+      "clusters": [
+        [
+          "recovery-b",
+          "collecting",
+          [
+            "active"
+          ]
+        ]
+      ],
+      "dashboard_status": 503
+    },
+    {
+      "label": "3 key restored",
+      "mode": "normal",
+      "recovery_reason": null,
+      "clusters": [
+        [
+          "recovery-b",
+          "collecting",
+          [
+            "active"
+          ]
+        ]
+      ],
+      "dashboard_status": 200
+    },
+    {
+      "label": "4 different key",
+      "mode": "recovery",
+      "recovery_reason": "암호화 키 문제: key fingerprint does not match the one recorded for this data directory",
+      "clusters": [
+        [
+          "recovery-b",
+          "collecting",
+          [
+            "active"
+          ]
+        ]
+      ],
+      "dashboard_status": 503
+    }
+  ],
+  "cleanup_delete_status": 200
+}

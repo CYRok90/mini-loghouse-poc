@@ -79,15 +79,15 @@ set -a; source scripts/dev.env; set +a     # 테스트 설정(비밀 없음): re
 
 ## 화면
 
-- `/` 클러스터 목록: 연결 확인 결과, 수집 상태(준비 중·첫 수집 대기·수집 중·수집 지연·수집 오류), 마지막 성공 시각, 노드 수집 범위(전체 검증됨·일부·미확인), 최근 오류
+- `/` 클러스터 목록: 연결 확인 결과(정상·실패·미확인 — 권한/테이블 오류는 연결 실패로 보지 않음), 수집 상태(준비 중·첫 수집 대기·수집 중·수집 지연·수집 오류), 마지막 성공 시각, 노드 수집 범위(전체 검증됨·일부·미확인), 최근 오류
 - `/clusters/new` 클러스터 추가: 연결 테스트(접속·인증과 system table 권한을 분리 표시, `system.clusters` 기반 노드 발견) → 저장 및 수집 시작
-- `/clusters/<id>` Dashboard: 기간(15분·1시간·24시간)·노드 필터, 자동 갱신, KPI, 쿼리 수·p95 차트, system.metrics, 최근·느린·오류 쿼리 표, 집계 정의
+- `/clusters/<id>` Dashboard: 기간(15분·1시간·24시간)·노드 필터, 자동 갱신, KPI, 쿼리 수·p95 차트, system.metrics, 최근·느린·오류 쿼리 표, 집계 정의, 클러스터 삭제. 선택 기간과 실제 수집 구간의 교집합으로 `미수집`·`부분 집계`·`실제 0`을 구분
 
 ## 자격증명 정책
 
 - 브라우저는 backend API만 호출합니다. password는 폼에만 있고 저장 요청 직후 지워지며, 어떤 조회 API도 반환하지 않습니다.
 - password는 chDB named collection(`local_encrypted`, AES-128-CTR)에만 저장됩니다. 키는 data dir 밖 파일에 있습니다. RMV DDL과 metadata에는 NC 이름만 남습니다.
-- 재시작 후에는 같은 키로 NC가 로드되어 **재입력 없이 수집이 재개**됩니다(검증 완료). 키가 없거나 다르면 앱은 **복구 모드**로 뜹니다. chDB를 열지 않고 SQLite의 등록·상태만 보여 줍니다. 복구 방법은 두 가지입니다. ① 원래 키 파일을 복원합니다. ② backend를 멈춘 뒤 `var/app/chdb/named_collections/`를 다른 곳으로 옮기고 `var/app/registry.sqlite3`의 `meta.key_fingerprint`를 지운 다음 재시작하고, 클러스터를 다시 등록합니다.
+- 재시작 후에는 같은 키로 NC가 로드되어 **재입력 없이 수집이 재개**됩니다(검증 완료). 키가 없거나 다르면 앱은 **복구 모드**로 뜹니다. chDB를 열지 않고 SQLite의 등록·상태만 보여 줍니다. 복구 방법은 두 가지입니다. ① 원래 키 파일을 복원합니다. ② 자격증명 초기화: backend를 멈추고 `var/app/chdb/named_collections/`를 다른 곳으로 옮긴 뒤, `sqlite3 var/app/registry.sqlite3 "DELETE FROM meta WHERE key='key_fingerprint'"`를 실행하고 재시작합니다. 노드는 `수집 오류(자격증명 없음)`으로 표시되므로 Dashboard의 `클러스터 삭제`로 지운 뒤 다시 등록합니다. 복구 모드에서는 수집이 멈춘 상태이므로 목록에 `수집 오류(복구 모드)`로 표시됩니다(검증: `experiments/recovery_mode.py`).
 - 로그·예외 응답은 분류 코드와 고정 메시지만 내보냅니다. chDB 원본 예외는 SQL(이스케이프된 password 포함)을 되돌려줄 수 있기 때문입니다.
 - 한계: 이 보호는 "키 없이 data dir만 유출된 경우"에 대한 것입니다. 같은 OS 사용자 권한을 가진 공격자, 수집된 **SQL 원문(query_log.query)** 자체의 민감정보는 보호 범위 밖입니다.
 
@@ -97,7 +97,8 @@ set -a; source scripts/dev.env; set +a     # 테스트 설정(비밀 없음): re
 .venv/bin/python -m pytest                          # 단위 테스트(오류 분류·cursor/gap·입력 검증·보안 미들웨어)
 .venv/bin/python experiments/phase_a_rmv.py create var/x.chdb && .venv/bin/python experiments/phase_a_rmv.py idle var/x.chdb 22
 .venv/bin/python experiments/day0_remote_rmv.py probe var/day0.chdb    # MLH_NC_KEY_HEX 필요, testenv 실행 중
-.venv/bin/python experiments/phase_c_resilience.py all                 # backend·testenv 실행 + 클러스터 A/B 등록 상태에서
+.venv/bin/python experiments/phase_c_resilience.py all                 # backend·testenv 실행 + A(19401)/B(19003) 등록 상태, 실패 시 exit 1
+.venv/bin/python experiments/recovery_mode.py                          # 별도 data dir·포트 8766에서 키 누락/불일치 복구 모드
 ```
 
 증거는 `evidence/`에 있습니다(phase_a, phase_a2, day0, app, phase_c, e2e 스크린샷). 브라우저 E2E는 Playwright(MCP)로 수행했습니다.

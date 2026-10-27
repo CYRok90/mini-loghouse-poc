@@ -14,9 +14,9 @@
   }
 
   function checkCell(check) {
-    const label = check.ok ? "연결 정상" : "연결 실패";
+    const [cls, label] = MLH.connLabel(check);
     const src = check.source === "collection" ? "수집 시도 기준" : "등록 시 검사";
-    return el("div", {}, el("span", { class: check.ok ? "check-ok" : "check-fail", text: label }),
+    return el("div", {}, el("span", { class: cls, text: label }),
       el("div", { class: "small muted", text: `${fmtTime(check.at_ms)} · ${src}` }));
   }
 

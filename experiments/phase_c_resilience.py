@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import os
+from collections import Counter
 import signal
 import subprocess
 import sys
@@ -55,7 +56,10 @@ def backend_alive() -> bool:
 
 
 def backend_stop() -> float:
-    pid = int(PID_FILE.read_text())
+    pid = int(PID_FILE.read_text().split()[0])
+    cmd = subprocess.run(["ps", "-o", "command=", "-p", str(pid)], capture_output=True, text=True).stdout
+    if "-m mlh" not in cmd:  # stale pid file must never signal an unrelated process (Codex P2-11)
+        raise RuntimeError(f"pid {pid} is not the mini-loghouse backend")
     started = time.monotonic()
     os.kill(pid, signal.SIGTERM)
     while time.monotonic() - started < 60:
@@ -79,8 +83,13 @@ def backend_start(logname: str = "backend.log") -> subprocess.Popen:
 
 
 # ---------------------------------------------------------------- data helpers
+A, B = "A", "B"  # cluster_a endpoint a1:19401 (TLS), cluster_b endpoint b1:19003
+
+
 def clusters() -> dict[str, dict]:
-    return {c["name"]: c for c in client().get("/api/clusters").json()["clusters"]}
+    """Keyed by role (A/B) via the endpoint port, so renaming a cluster in the UI does not matter."""
+    roles = {19401: A, 19003: B}
+    return {roles.get(c["port"], c["name"]): c for c in client().get("/api/clusters").json()["clusters"]}
 
 
 def diag(cluster_id: str, prefix: str | None = None) -> dict:
@@ -94,35 +103,51 @@ def flush_all() -> None:
             testenv.http_query(node, "SYSTEM FLUSH LOGS")
 
 
-def source_events(prefix: str, nodes: list[str]) -> set[tuple]:
-    sql = ("SELECT displayName() AS node, query_id, toString(type) AS type, toUnixTimestamp64Micro(event_time_microseconds) AS t"
+def source_events(prefix: str, nodes: list[str]) -> list[tuple]:
+    sql = ("SELECT displayName() AS node, query_id, toString(type) AS type, toUnixTimestamp64Micro(event_time_microseconds) AS t,"
+           " is_initial_query AS initial"
            f" FROM system.query_log WHERE (startsWith(query_id, '{prefix}') OR startsWith(initial_query_id, '{prefix}'))"
            " AND log_comment = 'mlh-testenv' FORMAT JSONEachRow")
-    found = set()
+    found = []
     for name in nodes:
         for line in testenv.http_query(testenv.NODES[name], sql).splitlines():
             r = json.loads(line)
-            found.add((r["node"], r["query_id"], r["type"], int(r["t"])))
+            found.append((r["node"], r["query_id"], r["type"], int(r["t"]), int(r["initial"])))
     return found
 
 
-def dest_events(cluster_ids: list[str], prefix: str) -> tuple[set[tuple], dict]:
-    found, stats = set(), {}
+def dest_events(cluster_ids: list[str], prefix: str) -> tuple[list[tuple], dict]:
+    """Multiset (list), not set: a duplicated row in the dedup view must fail the check (Codex P2-12)."""
+    found, stats = [], {}
     for cid in cluster_ids:
         d = diag(cid, prefix)["prefix"]
         stats[cid] = {k: d[k] for k in ("raw_rows", "final_rows", "initial_queries")}
-        found |= {(e["node"], e["query_id"], e["type"], int(e["t"])) for e in d["events"]}
+        found += [(e["node"], e["query_id"], e["type"], int(e["t"])) for e in d["events"]]
     return found, stats
 
 
 def compare(prefix: str, nodes: list[str], cluster_ids: list[str]) -> dict:
     flush_all()
-    src = source_events(prefix, nodes)
+    src_full = source_events(prefix, nodes)
+    src = [e[:4] for e in src_full]
     dst, stats = dest_events(cluster_ids, prefix)
+    src_c, dst_c = Counter(src), Counter(dst)
+    # computed from the SOURCE (independent of the dashboard SQL): initial, non-QueryStart rows
+    expected_initial = sum(1 for e in src_full if e[4] == 1 and e[2] != "QueryStart")
+    final_rows = sum(v["final_rows"] for v in stats.values())
+    initial = sum(v["initial_queries"] for v in stats.values())
+    checks = {
+        "non_empty": len(src) > 0,
+        "multiset_equal": src_c == dst_c,
+        "final_rows_equal_source": final_rows == len(src),
+        "initial_queries_independent": initial == expected_initial,
+    }
     return {
         "prefix": prefix, "source_events": len(src), "dest_events": len(dst),
-        "missing_in_dest": sorted(map(list, src - dst))[:20], "extra_in_dest": sorted(map(list, dst - src))[:20],
-        "dest_stats": stats, "match": src == dst,
+        "missing_in_dest": sorted(map(list, (src_c - dst_c).elements()))[:20],
+        "extra_in_dest": sorted(map(list, (dst_c - src_c).elements()))[:20],
+        "dest_stats": stats, "expected_initial_queries": expected_initial, "checks": checks,
+        "match": all(checks.values()),
     }
 
 
@@ -133,8 +158,8 @@ def save(name: str, data: dict) -> dict:
     return data
 
 
-def node_states(name: str) -> dict:
-    c = clusters()[name]
+def node_states(role: str) -> dict:
+    c = clusters()[role]
     return {"cluster_state": c["state"], "coverage": c["coverage"]["label"],
             "nodes": {n["display_name"]: {s: (v["state"], (v["error"] or {}).get("category")) for s, v in n["sources"].items()} for n in c["nodes"]}}
 
@@ -151,7 +176,7 @@ def c1() -> dict:
     testenv.http_query(a1, "SELECT count() FROM clusterAllReplicas('cluster_a', system.one)", f"{tag}-dist")
     time.sleep(SETTLE)
     cl = clusters()
-    ids = [cl["cluster-A (TLS)"]["id"], cl["cluster-B"]["id"]]
+    ids = [cl[A]["id"], cl[B]["id"]]
     result = compare(tag, ["a1", "a2", "b1"], ids)
     a = diag(ids[0], f"{tag}-reuse")["prefix"]["events"]
     dist = diag(ids[0], f"{tag}-dist")["prefix"]["events"]
@@ -174,7 +199,7 @@ def c2() -> dict:
     log("backend restarted; waiting for refresh + backfill")
     time.sleep(SETTLE + 15)
     cl = clusters()
-    ids = [cl["cluster-A (TLS)"]["id"], cl["cluster-B"]["id"]]
+    ids = [cl[A]["id"], cl[B]["id"]]
     result = compare(tag, ["a1", "a2", "b1"], ids)
     result.update({
         "backend_stop_seconds": round(stop_s, 1), "downtime_seconds": down_for,
@@ -199,13 +224,13 @@ def c3() -> dict:
         timings[name] = {"status": code, "seconds": round(time.monotonic() - t0, 3)}
     testenv.workload(f"{tag}-down", 2)  # a1 and b1 only (a2 stopped)
     time.sleep(SETTLE)
-    down_cmp = compare(f"{tag}-down", ["a1", "b1"], [cl["cluster-A (TLS)"]["id"], cl["cluster-B"]["id"]])
+    down_cmp = compare(f"{tag}-down", ["a1", "b1"], [cl[A]["id"], cl[B]["id"]])
     testenv.start(["a2"])
     time.sleep(10)
     testenv.workload(f"{tag}-up", 2)
     time.sleep(SETTLE + 15)
-    up_cmp = compare(f"{tag}-up", ["a1", "a2", "b1"], [cl["cluster-A (TLS)"]["id"], cl["cluster-B"]["id"]])
-    a_id = cl["cluster-A (TLS)"]["id"]
+    up_cmp = compare(f"{tag}-up", ["a1", "a2", "b1"], [cl[A]["id"], cl[B]["id"]])
+    a_id = cl[A]["id"]
     return save("c3_node_failure", {
         "during_outage": during, "dashboard_during_outage": timings, "collected_while_a2_down": down_cmp,
         "after_recovery": {n: node_states(n) for n in clusters()}, "collected_after_recovery": up_cmp,
@@ -237,11 +262,12 @@ def c5() -> dict:
     """Plaintext secret scan over data dir, logs, evidence and API responses."""
     secrets_ = json.loads((ROOT / "var" / "testenv" / "secrets.json").read_text())
     marks = {k: v.encode() for k, v in secrets_.items()}
-    roots = [ROOT / "var" / "app", ROOT / "evidence", ROOT / "mlh"]
+    roots = [ROOT / "var" / "app", ROOT / "evidence", ROOT / "mlh", ROOT / "var" / "testenv"]
+    allowed = {ROOT / "var" / "testenv" / "secrets.json", ROOT / "var" / "testenv" / "e2e_password"}
     hits = []
     for root in roots:
         for path in root.rglob("*"):
-            if path.is_file():
+            if path.is_file() and path not in allowed:
                 data = path.read_bytes()
                 hits += [f"{path.relative_to(ROOT)}:{k}" for k, m in marks.items() if m in data]
     c = client()
@@ -255,10 +281,29 @@ def c5() -> dict:
     })
 
 
+def passed(name: str, r: dict) -> bool:
+    """Required conditions per scenario; any failure makes the script exit non-zero (Codex P2-12)."""
+    if name == "c1":
+        return r["match"] and len(r["query_id_reuse_events"]) == 4
+    if name == "c2":
+        return r["match"] and r["registry_preserved"] and not r["credential_reentry_needed"]
+    if name == "c3":
+        down = r["during_outage"][A]["nodes"]
+        return (r["collected_while_a2_down"]["match"] and r["collected_after_recovery"]["match"]
+                and down["a2"]["metrics"][0] == "error" and down["a1"]["metrics"][0] == "collecting")
+    if name == "c4":
+        return r["second_instance_exit_code"] != 0 and r["original_still_serving"] and r["views_unchanged"]
+    return not r["plaintext_hits"] and not r["api_hits"]
+
+
 if __name__ == "__main__":
     which = sys.argv[1] if len(sys.argv) > 1 else "all"
     steps = {"c1": c1, "c2": c2, "c3": c3, "c4": c4, "c5": c5}
+    failed = []
     for key, fn in steps.items():
         if which in (key, "all"):
             log(f"== {key} ==")
-            fn()
+            if not passed(key, fn()):
+                failed.append(key)
+    log(f"RESULT: {'FAIL ' + ','.join(failed) if failed else 'PASS'}")
+    sys.exit(1 if failed else 0)

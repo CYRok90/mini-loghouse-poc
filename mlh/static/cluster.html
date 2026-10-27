@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>클러스터 Dashboard · mini-loghouse</title>
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="/static/app.css?v=4">
-  <script src="/static/common.js?v=4" defer></script>
-  <script src="/static/chart.js?v=4" defer></script>
-  <script src="/static/cluster.js?v=4" defer></script>
+  <link rel="stylesheet" href="/static/app.css?v=6">
+  <script src="/static/common.js?v=6" defer></script>
+  <script src="/static/chart.js?v=6" defer></script>
+  <script src="/static/cluster.js?v=6" defer></script>
 </head>
 <body>
   <header class="top">
@@ -30,6 +30,7 @@
       <label class="small"><input type="checkbox" id="auto" checked> 자동 갱신 (10초)</label>
       <span class="spacer"></span>
       <span class="small muted" id="freshness"></span>
+      <button type="button" id="delete" class="danger">클러스터 삭제</button>
     </div>
     <section class="card"><h2>노드별 수집 상태</h2><div id="nodes"></div></section>
     <div class="tiles" id="tiles"></div>

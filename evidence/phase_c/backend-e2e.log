@@ -119,3 +119,11 @@ INFO:     127.0.0.1:54660 - "POST /api/clusters HTTP/1.1" 409 Conflict
 INFO:     127.0.0.1:54846 - "GET /api/clusters HTTP/1.1" 200 OK
 INFO:     127.0.0.1:54847 - "GET /api/clusters/ceb26d8253e22/diagnostics HTTP/1.1" 200 OK
 INFO:     127.0.0.1:54848 - "GET /api/clusters/c17d44ea61b79/diagnostics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55285 - "GET /api/clusters HTTP/1.1" 200 OK
+2026-10-28 05:40:05,073 INFO mlh.supervisor: node n2d1a6b3ba106 gap pending [1793133572, 1793133578) collection_interrupted
+2026-10-28 05:40:05,074 INFO mlh.supervisor: node na976f56792d5 gap pending [1793133572, 1793133578) collection_interrupted
+2026-10-28 05:40:07,103 INFO mlh.supervisor: node n79945e956cbd gap pending [1793133572, 1793133578) collection_interrupted
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1494]

@@ -1,0 +1,20 @@
+## overnight browserless continuity (registry cursors/gaps, read-only)
+b1 covered 10-27 22:13:46 -> 10-28 05:41:32 (7.5 h)
+   gap 10-28 05:39:32 -> 10-28 05:39:38 6s backfilled collection_interrupted
+a1 covered 10-27 22:16:58 -> 10-28 05:41:32 (7.4 h)
+   gap 10-28 05:39:32 -> 10-28 05:39:38 6s backfilled collection_interrupted
+a2 covered 10-27 22:16:58 -> 10-28 05:41:32 (7.4 h)
+   gap 10-27 22:18:37 -> 10-27 22:19:18 41s backfilled collection_interrupted
+   gap 10-28 05:39:32 -> 10-28 05:39:38 6s backfilled collection_interrupted
+  transition ('n2d1a6b3ba106', 'metrics', 'collecting', 'error', 'refused', '2026-10-28 05:39:46')
+  transition ('n2d1a6b3ba106', 'query_log', 'collecting', 'error', 'refused', '2026-10-28 05:39:46')
+  transition ('na976f56792d5', 'metrics', 'collecting', 'error', 'refused', '2026-10-28 05:39:46')
+  transition ('na976f56792d5', 'query_log', 'collecting', 'error', 'refused', '2026-10-28 05:39:46')
+  transition ('n79945e956cbd', 'metrics', 'collecting', 'error', 'refused', '2026-10-28 05:39:46')
+  transition ('n79945e956cbd', 'query_log', 'collecting', 'error', 'refused', '2026-10-28 05:39:46')
+  transition ('n2d1a6b3ba106', 'query_log', 'error', 'collecting', None, '2026-10-28 05:40:05')
+  transition ('na976f56792d5', 'query_log', 'error', 'collecting', None, '2026-10-28 05:40:05')
+  transition ('n79945e956cbd', 'metrics', 'error', 'collecting', None, '2026-10-28 05:40:05')
+  transition ('n2d1a6b3ba106', 'metrics', 'error', 'collecting', None, '2026-10-28 05:40:07')
+  transition ('na976f56792d5', 'metrics', 'error', 'collecting', None, '2026-10-28 05:40:07')
+  transition ('n79945e956cbd', 'query_log', 'error', 'collecting', None, '2026-10-28 05:40:07')

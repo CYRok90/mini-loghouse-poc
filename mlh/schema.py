@@ -69,6 +69,16 @@ _QUERY_LOG_SELECT = (
 )
 
 
+# Bump when the RMV SELECT changes; stored per node so a restart with different
+# settings or SQL recreates the RMVs and the cursor uses the spec that produced the data.
+RMV_VERSION = 2
+
+
+def rmv_spec(settings: Settings) -> dict:
+    return {"v": RMV_VERSION, "refresh": settings.refresh_seconds, "lag": settings.safety_lag_seconds,
+            "window": settings.query_window_seconds}
+
+
 def nc_name(node_id: str) -> str:
     return identifier(f"mlh_{node_id}")
 
@@ -117,7 +127,9 @@ def query_log_mv_sql(settings: Settings, cluster_id: str, node_id: str, tls: boo
         "SELECT {cid:String} AS cluster_id, {nid:String} AS node_id, displayName() AS source_display_name, "
         f"{_QUERY_LOG_SELECT}, now64(3, 'UTC') AS collected_at, 'rmv' AS collect_path "
         f"FROM {remote_fn(tls)}({nc_name(node_id)}, database = 'system', table = 'query_log') "
-        f"WHERE event_date >= toDate(now() - INTERVAL {lag + window} SECOND) "
+        # event_date is in the SOURCE server time zone; widen by one day so a time-zone difference
+        # can never drop rows (event_time, an absolute instant, does the exact filtering).
+        f"WHERE event_date >= toDate(now() - INTERVAL {lag + window} SECOND) - 1 "
         f"AND event_time >= now() - INTERVAL {lag + window} SECOND "
         f"AND event_time < now() - INTERVAL {lag} SECOND "
         f"AND log_comment != {literal(settings.collector_tag)} "
@@ -133,7 +145,7 @@ def backfill_sql(settings: Settings, node_id: str, tls: bool) -> str:
         "SELECT {cid:String} AS cluster_id, {nid:String} AS node_id, displayName() AS source_display_name, "
         f"{_QUERY_LOG_SELECT}, now64(3, 'UTC') AS collected_at, 'backfill' AS collect_path "
         f"FROM {remote_fn(tls)}({nc_name(node_id)}, database = 'system', table = 'query_log') "
-        "WHERE event_date >= toDate(toDateTime({lo:UInt32})) AND event_date <= toDate(toDateTime({hi:UInt32})) "
+        "WHERE event_date >= toDate(toDateTime({lo:UInt32})) - 1 AND event_date <= toDate(toDateTime({hi:UInt32})) + 1 "
         "AND event_time >= toDateTime({lo:UInt32}) AND event_time < toDateTime({hi:UInt32}) "
         f"AND log_comment != {literal(settings.collector_tag)} "
         f"SETTINGS log_comment = {literal(settings.collector_tag)}, {_REMOTE_SETTINGS}"

@@ -94,10 +94,19 @@ def status_changed(old: dict | None, new: dict) -> bool:
     return any(old.get(k) != new.get(k) for k in keys)
 
 
-def advance_cursor(cursor: dict | None, success_ts: int, now: float,
-                   settings: Settings) -> tuple[tuple[int, int] | None, list[Gap]]:
-    """Return ((first_lo, committed_hi) or None if unchanged, gaps to record)."""
-    lag, window = settings.safety_lag_seconds, settings.query_window_seconds
+def advance_cursor(cursor: dict | None, success_ts: int, now: float, settings: Settings,
+                   spec: dict | None = None) -> tuple[tuple[int, int] | None, list[Gap]]:
+    """Return ((first_lo, committed_hi) or None if unchanged, gaps to record).
+
+    `spec` is the RMV spec stored for the node (lag/window/refresh that produced
+    this success); it falls back to current settings only for legacy rows.
+    A gap starts `overlap` seconds BEFORE committed_hi: steady-state windows would
+    have re-read that tail for late-flushed rows, so recovery must too (Codex P1-2).
+    """
+    lag = int((spec or {}).get("lag", settings.safety_lag_seconds))
+    window = int((spec or {}).get("window", settings.query_window_seconds))
+    refresh = int((spec or {}).get("refresh", settings.refresh_seconds))
+    overlap = max(0, window - refresh)
     hi = success_ts - lag
     lo = success_ts + 1 - lag - window
     if cursor is None:
@@ -108,7 +117,7 @@ def advance_cursor(cursor: dict | None, success_ts: int, now: float,
         return None, []
     gaps: list[Gap] = []
     if lo > committed:
-        gap_lo, floor = committed, int(now) - settings.max_backfill_seconds
+        gap_lo, floor = committed - overlap, int(now) - settings.max_backfill_seconds
         if gap_lo < floor:
             gaps.append(Gap(gap_lo, min(floor, lo), "unrecoverable", "older_than_max_backfill"))
             gap_lo = floor

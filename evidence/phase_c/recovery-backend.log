@@ -1,0 +1,62 @@
+INFO:     Started server process [13799]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8766 (Press CTRL+C to quit)
+INFO:     127.0.0.1:55012 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55013 - "POST /api/clusters HTTP/1.1" 201 Created
+INFO:     127.0.0.1:55041 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55041 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55041 - "GET /api/clusters/c4ed2c1ae27d7/dashboard HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [13799]
+INFO:     Started server process [13831]
+INFO:     Waiting for application startup.
+2026-10-27 22:24:13,174 ERROR mlh.api: recovery mode: key file is missing
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8766 (Press CTRL+C to quit)
+INFO:     127.0.0.1:55043 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55044 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55044 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55044 - "GET /api/clusters/c4ed2c1ae27d7/dashboard HTTP/1.1" 503 Service Unavailable
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [13831]
+INFO:     Started server process [13833]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8766 (Press CTRL+C to quit)
+INFO:     127.0.0.1:55049 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55075 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55075 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55075 - "GET /api/clusters/c4ed2c1ae27d7/dashboard HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [13833]
+INFO:     Started server process [13858]
+INFO:     Waiting for application startup.
+2026-10-27 22:24:26,613 ERROR mlh.api: recovery mode: key fingerprint does not match the one recorded for this data directory
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8766 (Press CTRL+C to quit)
+INFO:     127.0.0.1:55077 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55078 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55078 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55078 - "GET /api/clusters/c4ed2c1ae27d7/dashboard HTTP/1.1" 503 Service Unavailable
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [13858]
+INFO:     Started server process [13859]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8766 (Press CTRL+C to quit)
+INFO:     127.0.0.1:55082 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55083 - "GET /api/clusters HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55084 - "DELETE /api/clusters/c4ed2c1ae27d7 HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [13859]

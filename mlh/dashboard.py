@@ -22,6 +22,7 @@ import time
 from typing import Any
 
 from .chdb_owner import ChdbOwner
+from .errors import CONNECTION_FAILURES
 from .registry import Registry
 from .settings import Settings
 from .sqlsafe import literal
@@ -65,7 +66,40 @@ def _source_view(status: dict) -> dict[str, Any]:
     }
 
 
-def cluster_view(registry: Registry, settings: Settings, cluster: dict) -> dict[str, Any]:
+RECOVERY_ERROR = {"category": "recovery_mode", "message": "복구 모드: 암호화 키 문제로 수집이 중단되었습니다.",
+                  "consecutive_failures": 0}
+
+
+def cluster_view(registry: Registry, settings: Settings, cluster: dict, recovery: bool = False) -> dict[str, Any]:
+    view = _cluster_view(registry, settings, cluster)
+    if not recovery:
+        return view
+    # SQLite still holds the last persisted states; collection is not running, so never show them as live.
+    return {**view, "state": "error", "state_label": STATE_LABEL["error"], "latest_error": RECOVERY_ERROR,
+            "last_check": {**view["last_check"], "ok": False, "state": "unknown"}}
+
+
+def _connection_check(cluster: dict, attempts: list[int], errors: list[dict]) -> dict[str, Any]:
+    """Connection result is separate from collection result (Codex P2-9).
+
+    failed : some source failed with a reach/auth category (refused, TLS, auth, ...)
+    unknown: the only errors are local (credential missing) - reachability was not tested
+    ok     : otherwise; permission/table/column errors mean the server answered and authenticated
+    """
+    if not attempts:
+        state = "ok" if cluster["last_check_ok"] else "failed"
+        return {"at_ms": _ms(cluster["last_check_at"]), "state": state, "ok": state == "ok", "source": "registration_probe"}
+    categories = {e["category"] for e in errors}
+    if categories & CONNECTION_FAILURES:
+        state = "failed"
+    elif categories and categories <= {"nc_missing", "recovery_mode"}:
+        state = "unknown"
+    else:
+        state = "ok"
+    return {"at_ms": max(attempts), "state": state, "ok": state == "ok", "source": "collection"}
+
+
+def _cluster_view(registry: Registry, settings: Settings, cluster: dict) -> dict[str, Any]:
     nodes = [node_view(registry, n) for n in registry.nodes(cluster["id"])]
     sources = [src for n in nodes for src in n["sources"].values()]
     attempts = [s["last_attempt_ms"] for s in sources if s["last_attempt_ms"]]
@@ -78,11 +112,7 @@ def cluster_view(registry: Registry, settings: Settings, cluster: dict) -> dict[
         "id": cluster["id"], "name": cluster["name"], "host": cluster["host"], "port": cluster["port"],
         "tls": bool(cluster["tls"]), "username": cluster["username"], "server_version": cluster["server_version"],
         "phase": cluster["phase"], "state": state, "state_label": STATE_LABEL[state],
-        "last_check": {
-            "at_ms": max(attempts) if attempts else _ms(cluster["last_check_at"]),
-            "ok": not errors if attempts else bool(cluster["last_check_ok"]),
-            "source": "collection" if attempts else "registration_probe",
-        },
+        "last_check": _connection_check(cluster, attempts, errors),
         "last_success_ms": min(successes) if len(successes) == len(sources) and sources else None,
         "newest_success_ms": max(successes) if successes else None,
         "latest_error": errors[0] if errors else None,
@@ -153,7 +183,44 @@ def _metric_sections(owner: ChdbOwner, params: dict, node_id: str | None) -> dic
     return {"current": current, "series": series, "curated": list(CURATED_METRICS)}
 
 
-def _coverage(registry: Registry, node_ids: list[str]) -> dict[str, Any]:
+def _subtract(spans: list[tuple[int, int]], holes: list[tuple[int, int]]) -> list[tuple[int, int]]:
+    out = spans
+    for h_lo, h_hi in holes:
+        nxt = []
+        for lo, hi in out:
+            if h_hi <= lo or h_lo >= hi:
+                nxt.append((lo, hi))
+                continue
+            if lo < h_lo:
+                nxt.append((lo, h_lo))
+            if h_hi < hi:
+                nxt.append((h_hi, hi))
+        out = nxt
+    return out
+
+
+def node_coverage(cursor: dict | None, gaps: list[dict], f: int, t: int, tail_allowance: int) -> dict[str, Any]:
+    """Seconds of [f, t) actually collected for one node (Codex P2-7).
+
+    Collected = [min(first_lo, backfilled gap lo), committed_hi) minus gaps not yet backfilled.
+    'full' tolerates the normal not-yet-collected tail (safety lag + one refresh).
+    """
+    backfilled = [g["lo"] for g in gaps if g["state"] == "backfilled"]
+    starts = ([cursor["first_lo"]] if cursor else []) + backfilled
+    if not cursor or not starts:
+        spans: list[tuple[int, int]] = []
+    else:
+        lo, hi = max(f, min(starts)), min(t, int(cursor["committed_hi"]))
+        holes = [(int(g["lo"]), int(g["hi"])) for g in gaps if g["state"] != "backfilled"]
+        spans = _subtract([(lo, hi)] if hi > lo else [], holes)
+    covered = sum(hi - lo for lo, hi in spans)
+    expected = max(1, (t - tail_allowance) - f)
+    state = "none" if covered == 0 else ("full" if covered >= expected - 1 else "partial")
+    return {"state": state, "covered_seconds": covered, "expected_seconds": expected,
+            "spans_ms": [[_ms(lo), _ms(hi)] for lo, hi in spans]}
+
+
+def _coverage(registry: Registry, node_ids: list[str], f: int, t: int, tail_allowance: int) -> dict[str, Any]:
     out = {}
     gaps = registry.gaps(node_ids)
     for nid in node_ids:
@@ -166,8 +233,16 @@ def _coverage(registry: Registry, node_ids: list[str]) -> dict[str, Any]:
             "committed_hi_ms": _ms(cursor["committed_hi"]) if cursor else None,
             "gaps": [{"lo_ms": _ms(g["lo"]), "hi_ms": _ms(g["hi"]), "state": g["state"], "reason": g["reason"]}
                      for g in node_gaps if g["state"] != "backfilled"],
+            "range": node_coverage(cursor, node_gaps, f, t, tail_allowance),
         }
     return out
+
+
+def range_state(coverage: dict[str, Any]) -> str:
+    states = {c["range"]["state"] for c in coverage.values()}
+    if not states or states == {"none"}:
+        return "none"
+    return "full" if states == {"full"} else "partial"
 
 
 def dashboard(owner: ChdbOwner, registry: Registry, settings: Settings, cluster: dict,
@@ -178,12 +253,14 @@ def dashboard(owner: ChdbOwner, registry: Registry, settings: Settings, cluster:
     if node_id:
         params["nid"] = node_id
     node_ids = [node_id] if node_id else [n["id"] for n in registry.nodes(cluster["id"])]
+    coverage = _coverage(registry, node_ids, now - span, now, settings.safety_lag_seconds + 2 * settings.refresh_seconds)
     return {
         "generated_ms": now * 1000, "range": range_key, "from_ms": (now - span) * 1000, "to_ms": now * 1000,
         "bucket_seconds": bucket, "node_id": node_id,
         "queries": _query_sections(owner, params, node_id),
         "metrics": _metric_sections(owner, params, node_id),
-        "coverage": _coverage(registry, node_ids),
+        "coverage": coverage,
+        "range_state": range_state(coverage),
         "safety_lag_seconds": settings.safety_lag_seconds,
     }
 

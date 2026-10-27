@@ -1,0 +1,5 @@
+engine OK 26.9.2.1
+[APPEND INCREMENTAL + remote()] ERR Code: 36. DB::Exception: Incremental refresh source must be a table, not a subquery or table function. (BAD_ARGUMENTS)
+[INCREMENTAL keyword placement variant] ERR Code: 62. DB::Exception: Syntax error: failed at position 59 (INCREMENTAL): INCREMENTAL APPEND TO t.sink AS SELECT event_time, query_id FROM remote('127.0.0.1:19003', system.query_log, 'mlh_collector', {p:String}). Expected one of: number, OFFSET, RANDOMIZE FOR, DEPENDS ON, SETTINGS, APPEND, TO INNER UUID, TO, token, OpeningRoundBracket, storage definition, ENGINE, PARTITION BY, PRIMARY KEY, ORDER
+[plain APPEND + remote() (control)] OK 
+[docs keyword check] settings like incremental: OK []

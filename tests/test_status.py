@@ -6,6 +6,8 @@ from mlh.status import advance_cursor, coverage_label, evaluate_source, worst_st
 S = replace(load_settings(), refresh_seconds=15, safety_lag_seconds=10, overlap_seconds=30,
             initial_backfill_seconds=900, max_backfill_seconds=86400)
 NODE = {"id": "n000000000001", "phase": "active"}
+REFUSED = ("Code: 519. DB::NetException: All attempts to get table structure failed. Log: \n\nCode: 279. DB::NetException: "
+           "All connection tries failed. Log: \n\nCode: 210. DB::NetException: Connection refused (127.0.0.1:19402). (NETWORK_ERROR)")
 
 
 def test_first_success_sets_cursor_and_initial_backfill_gap():
@@ -20,17 +22,34 @@ def test_overlapping_windows_are_contiguous():
     assert gaps == [] and cursor == (0, 1005)
 
 
-def test_interruption_longer_than_overlap_creates_gap():
+def test_interruption_longer_than_overlap_creates_gap_rewound_by_overlap():
     cursor, gaps = advance_cursor({"first_lo": 0, "committed_hi": 990}, 1200, 1200, S)
     lo_new = 1200 + 1 - 10 - 45
-    assert [(g.lo, g.hi, g.state) for g in gaps] == [(990, lo_new, "pending")]
+    # Codex P1-2: start 30s (overlap) before committed_hi so late-flushed rows of the tail are re-read
+    assert [(g.lo, g.hi, g.state) for g in gaps] == [(990 - 30, lo_new, "pending")]
     assert cursor == (0, 1190)
+
+
+def test_late_arrival_just_before_cursor_is_inside_recovery_gap():
+    # Codex P1-2 counterexample: lag=10, window=45, last success 1000 -> cursor 990;
+    # an event at t=985 flushed at 1005 while the app was down must be re-read on recovery at 1100.
+    _, gaps = advance_cursor({"first_lo": 0, "committed_hi": 990}, 1100, 1100, S)
+    assert any(g.lo <= 985 < g.hi for g in gaps)
+
+
+def test_cursor_uses_stored_spec_not_current_settings():
+    # Codex P1-1 counterexample: RMV created with refresh 5 / lag 8 / window 20, settings now overlap 55.
+    current = replace(S, refresh_seconds=5, safety_lag_seconds=8, overlap_seconds=55)
+    stored = {"v": 2, "refresh": 5, "lag": 8, "window": 20}
+    _, gaps = advance_cursor({"first_lo": 0, "committed_hi": 992}, 1100, 1100, current, stored)
+    lo_actual = 1100 + 1 - 8 - 20  # what the stored RMV really read: [1073, 1092)
+    assert gaps and gaps[-1].hi == lo_actual  # the hole up to the RMV's real lower bound is a gap
 
 
 def test_gap_older_than_max_backfill_is_unrecoverable():
     now = 200000
     cursor, gaps = advance_cursor({"first_lo": 0, "committed_hi": 1000}, now, now, S)
-    assert gaps[0].state == "unrecoverable" and gaps[0].lo == 1000 and gaps[0].hi == now - 86400
+    assert gaps[0].state == "unrecoverable" and gaps[0].lo == 1000 - 30 and gaps[0].hi == now - 86400
     assert gaps[1].state == "pending" and gaps[1].lo == now - 86400
 
 
@@ -45,9 +64,9 @@ def test_states():
     assert late["state"] == "delayed"
     first = evaluate_source(NODE, "metrics", {"last_success_ts": None, "last_refresh_ts": None, "exception": ""}, None, 100, S)
     assert first["state"] == "waiting_first"
-    err = evaluate_source(NODE, "metrics", {"last_success_ts": 90, "last_refresh_ts": 100, "exception": "Connection refused (127.0.0.1:19402)"}, None, 101, S)
+    err = evaluate_source(NODE, "metrics", {"last_success_ts": 90, "last_refresh_ts": 100, "exception": REFUSED}, None, 101, S)
     assert err["state"] == "error" and err["last_error_category"] == "refused" and err["consecutive_failures"] == 1
-    again = evaluate_source(NODE, "metrics", {"last_success_ts": 90, "last_refresh_ts": 105, "exception": "Connection refused"}, err, 106, S)
+    again = evaluate_source(NODE, "metrics", {"last_success_ts": 90, "last_refresh_ts": 105, "exception": REFUSED}, err, 106, S)
     assert again["consecutive_failures"] == 2
 
 

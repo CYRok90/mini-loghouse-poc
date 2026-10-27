@@ -31,3 +31,20 @@ def test_unknown_is_unclassified_and_message_is_fixed():
     info = classify(raw)
     assert info.category == "unclassified"
     assert "hunter2" not in info.message and info.codes == (999,)
+
+
+def test_user_strings_cannot_select_category():
+    # Codex review counterexample: a username that looks like an error name.
+    raw = ("Code: 516. DB::Exception: Received from 127.0.0.1:19003. DB::Exception: DNS_ERROR: Authentication failed: "
+           "password is incorrect, or there is no user with such name. (AUTHENTICATION_FAILED)")
+    assert classify(raw).category == "auth"
+
+
+def test_sql_text_in_unrelated_code_is_unclassified():
+    raw = "Code: 62. DB::Exception: Syntax error near 'Connection refused SSL Exception ACCESS_DENIED'. (SYNTAX_ERROR)"
+    assert classify(raw).category == "unclassified"
+
+
+def test_innermost_code_wins_over_wrappers():
+    raw = WRAP.format(inner="Code: 209. DB::NetException: Timeout: connect timed out: h:9000. (SOCKET_TIMEOUT)")
+    assert classify(raw).codes == (519, 279, 209) and classify(raw).category == "timeout"

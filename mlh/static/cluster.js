@@ -16,7 +16,7 @@
       el("p", { class: "sub mono", text: `${c.host}:${c.port} · ${c.tls ? "TLS (remoteSecure)" : "평문 (remote, 로컬 테스트 전용)"} · user ${c.username} · ClickHouse ${c.server_version || "?"}` }),
       el("div", { class: "toolbar" },
         stateBadge(c.state, c.state_label),
-        el("span", { class: c.last_check.ok ? "check-ok small" : "check-fail small", text: `연결 확인 ${c.last_check.ok ? "정상" : "실패"} · ${fmtTime(c.last_check.at_ms)}` }),
+        el("span", { class: `${MLH.connLabel(c.last_check)[0]} small`, text: `${MLH.connLabel(c.last_check)[1]} · ${fmtTime(c.last_check.at_ms)}` }),
         el("span", { class: "small", text: `마지막 성공 수집(모든 노드·소스): ${fmtTime(c.last_success_ms)} (${fmtAge(c.last_success_ms)})` }),
         el("span", { class: "badge", text: `수집 범위: ${cov.label}` }),
         el("span", { class: "small muted", text: cov.discovered_cluster ? `${cov.confirmed_nodes}/${cov.candidate_nodes} 노드 수집 확인 (${cov.discovered_cluster})` : `${cov.confirmed_nodes}노드 · 클러스터 구성 미발견` })));
@@ -69,8 +69,15 @@
     return out;
   }
 
+  // Coverage of the SELECTED range (server-computed): none | partial | full (Codex P2-7).
   function anyCoverage(dash) {
-    return Object.values(dash.coverage).some((c) => c.collected_from_ms);
+    return dash.range_state !== "none";
+  }
+
+  function coverageNote(dash) {
+    if (dash.range_state !== "partial") return "";
+    const parts = Object.entries(dash.coverage).map(([, c]) => Math.round((100 * c.range.covered_seconds) / c.range.expected_seconds));
+    return `부분 집계: 선택 기간 중 수집된 구간만 집계 (노드별 ${parts.join("/")}%)`;
   }
 
   // ------------------------------------------------------------------ tiles & charts
@@ -82,11 +89,12 @@
     const s = dash.queries.summary;
     const covered = anyCoverage(dash);
     const v = (x) => (covered ? fmtNum(x) : "미수집");
-    const zeroNote = (x) => (covered && Number(x) === 0 ? "실제 0 (수집 완료 구간 기준)" : "");
+    const partial = coverageNote(dash);
+    const zeroNote = (x) => (covered && Number(x) === 0 ? (partial ? "수집된 구간에서 0 (일부 구간 미수집)" : "실제 0 (수집 완료 구간 기준)") : partial);
     clear($("tiles")).append(
       tile("기록된 initial 쿼리 수", v(s.initial_queries), zeroNote(s.initial_queries) || `QueryStart ${fmtNum(s.query_start_rows)}행은 제외`),
       tile("실패 수", v(s.initial_failed), zeroNote(s.initial_failed) || "Exception* (initial)"),
-      tile("노드 실행 이벤트 수", v(s.node_events), "분산 하위 쿼리 포함 (노드별 실행)"),
+      tile("노드 실행 이벤트 수", v(s.node_events), partial || "분산 하위 쿼리 포함 (노드별 실행)"),
       tile("성공 쿼리 지연 p95", covered && s.p95_ms !== null ? `${fmtNum(s.p95_ms)} ms` : covered ? "—" : "미수집",
         covered ? `표본 ${fmtNum(s.p95_samples)}건${s.p95_ms === null ? " (성공 쿼리 없음)" : ""}` : ""));
   }
@@ -134,7 +142,12 @@
     const rows = dash.queries.tables[state.tab] || [];
     const box = clear($("table"));
     if (!anyCoverage(dash)) { box.append(el("p", { class: "empty", text: "미수집 — 아직 수집된 구간이 없습니다." })); return; }
-    if (!rows.length) { box.append(el("p", { class: "empty", text: "선택 기간·노드에 해당 쿼리가 없습니다 (수집 완료 구간 기준 실제 0건)." })); return; }
+    if (!rows.length) {
+      const msg = dash.range_state === "full" ? "선택 기간·노드에 해당 쿼리가 없습니다 (수집 완료 구간 기준 실제 0건)."
+        : "수집된 구간에는 해당 쿼리가 없습니다. 선택 기간의 일부는 미수집입니다.";
+      box.append(el("p", { class: "empty", text: msg }));
+      return;
+    }
     const head = el("tr", {}, ["출처 노드", "이벤트 시각", "query_id", "이벤트 종류", "실행 시간", "결과 / 오류", "SQL"].map((t) => el("th", { text: t, class: t === "실행 시간" ? "num" : "" })));
     box.append(el("table", {}, el("thead", {}, head), el("tbody", {}, rows.map(queryRow))));
   }
@@ -177,6 +190,15 @@
   document.querySelectorAll("#ranges button").forEach((b) => b.addEventListener("click", () => { state.range = b.dataset.range; syncControls(); load(); }));
   $("node").addEventListener("change", (e) => { state.node = e.target.value; syncControls(); load(); });
   $("refresh").addEventListener("click", load);
+  $("delete").addEventListener("click", async () => {
+    const name = state.detail ? state.detail.name : clusterId;
+    if (!window.confirm(`'${name}'의 수집을 중단하고 등록·자격증명을 삭제합니다. 수집된 이력은 보존 기간(TTL) 동안 남지만 화면에서는 볼 수 없습니다. 계속할까요?`)) return;
+    $("delete").disabled = true;
+    const res = await api(`/api/clusters/${clusterId}`, { method: "DELETE" });
+    if (res.ok) { window.location.assign("/"); return; }
+    $("delete").disabled = false;
+    clear($("banners")).append(el("div", { class: "banner error" }, el("strong", { text: "삭제하지 못했습니다." }), `HTTP ${res.status}`));
+  });
   $("auto").addEventListener("change", (e) => setAuto(e.target.checked));
   document.querySelectorAll("[role=tab]").forEach((b) => b.addEventListener("click", () => {
     state.tab = b.dataset.tab;

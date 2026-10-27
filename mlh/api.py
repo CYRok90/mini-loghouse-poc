@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 import re
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
@@ -22,7 +23,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import Field
 
 from . import dashboard, provisioner, security
-from .chdb_owner import ChdbOwner, write_private
+from .chdb_owner import ChdbOwner, acquire_lock, write_private
 from .keystore import KeyError_, load_or_create
 from .probe import render_probe_config, run_probe
 from .registration import RegistrationError, endpoint_payload, register, summarize
@@ -43,6 +44,7 @@ class Runtime:
     owner: ChdbOwner | None
     supervisor: Supervisor | None
     recovery_reason: str | None
+    lock_fd: int
 
 
 class ProbeBody(ProbeRequest):
@@ -50,28 +52,42 @@ class ProbeBody(ProbeRequest):
 
 
 def start_runtime(settings: Settings) -> Runtime:
+    # Lock FIRST (Codex P2-6): a losing second process must not read or write the
+    # registry/key fingerprint before it learns another backend owns the data dir.
+    lock_fd = acquire_lock(settings.lock_path)
+    try:
+        return _start_locked(settings, lock_fd)
+    except BaseException:
+        os.close(lock_fd)
+        raise
+
+
+def _start_locked(settings: Settings, lock_fd: int) -> Runtime:
     registry = Registry(settings.registry_path)
     fingerprint = registry.get_meta("key_fingerprint")
     try:
         key = load_or_create(settings.key_file, fingerprint)
     except KeyError_ as exc:
         log.error("recovery mode: %s", exc)
-        return Runtime(registry, None, None, f"암호화 키 문제: {exc}")
+        return Runtime(registry, None, None, f"암호화 키 문제: {exc}", lock_fd)
     if fingerprint is None:
         registry.set_meta("key_fingerprint", key.fingerprint)
-    owner = ChdbOwner(settings, key)  # raises AlreadyRunning before touching chDB
+    owner = ChdbOwner(settings, key)
     write_private(settings.data_dir / "probe-config.xml", render_probe_config(settings))
     provisioner.reconcile(owner, registry, settings)
     supervisor = Supervisor(owner, registry, settings)
     supervisor.start()
-    return Runtime(registry, owner, supervisor, None)
+    return Runtime(registry, owner, supervisor, None, lock_fd)
 
 
 def stop_runtime(runtime: Runtime) -> None:
-    if runtime.supervisor:
-        runtime.supervisor.stop()
-    if runtime.owner:
-        runtime.owner.close()
+    try:
+        if runtime.supervisor:
+            runtime.supervisor.stop()
+        if runtime.owner:
+            runtime.owner.close()
+    finally:
+        os.close(runtime.lock_fd)
 
 
 def create_app(settings: Settings) -> FastAPI:
@@ -156,14 +172,14 @@ def _api(app: FastAPI, settings: Settings) -> None:
     @app.get("/api/clusters")
     async def list_clusters() -> dict:
         rt = _rt(app)
-        views = [dashboard.cluster_view(rt.registry, settings, c) for c in rt.registry.clusters()]
+        views = [dashboard.cluster_view(rt.registry, settings, c, rt.owner is None) for c in rt.registry.clusters()]
         return {"mode": "recovery" if rt.owner is None else "normal", "clusters": views}
 
     @app.get("/api/clusters/{cluster_id}")
     async def get_cluster(cluster_id: str) -> dict:
         rt = _rt(app)
         cluster = _cluster_or_404(rt, cluster_id)
-        view = dashboard.cluster_view(rt.registry, settings, cluster)
+        view = dashboard.cluster_view(rt.registry, settings, cluster, rt.owner is None)
         node_ids = [n["id"] for n in view["nodes"]]
         return {**view, "transitions": rt.registry.transitions(node_ids, 30)}
 

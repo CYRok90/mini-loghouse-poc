@@ -1,37 +1,44 @@
 {
-  "prefix": "c1x1793095952",
+  "prefix": "c1x1793133693",
   "source_events": 44,
   "dest_events": 44,
   "missing_in_dest": [],
   "extra_in_dest": [],
   "dest_stats": {
-    "c5f40eca51dba": {
-      "raw_rows": 64,
+    "c17d44ea61b79": {
+      "raw_rows": 78,
       "final_rows": 32,
       "initial_queries": 15
     },
-    "c706e6b6cc403": {
-      "raw_rows": 36,
+    "ceb26d8253e22": {
+      "raw_rows": 24,
       "final_rows": 12,
       "initial_queries": 6
     }
   },
+  "expected_initial_queries": 21,
+  "checks": {
+    "non_empty": true,
+    "multiset_equal": true,
+    "final_rows_equal_source": true,
+    "initial_queries_independent": true
+  },
   "match": true,
   "query_id_reuse_events": [
     [
-      "c1x1793095952-reuse",
+      "c1x1793133693-reuse",
       "QueryStart"
     ],
     [
-      "c1x1793095952-reuse",
+      "c1x1793133693-reuse",
       "QueryFinish"
     ],
     [
-      "c1x1793095952-reuse",
+      "c1x1793133693-reuse",
       "QueryStart"
     ],
     [
-      "c1x1793095952-reuse",
+      "c1x1793133693-reuse",
       "QueryFinish"
     ]
   ],
@@ -58,26 +65,44 @@
     ]
   ],
   "raw_vs_final_all": {
-    "c5f40eca51dba": [
+    "c17d44ea61b79": [
       {
-        "node_id": "n9bf19a0b04ce",
-        "collect_path": "rmv",
-        "raw_rows": 70,
-        "distinct_events": 52
+        "node_id": "n79945e956cbd",
+        "collect_path": "backfill",
+        "raw_rows": 18,
+        "distinct_events": 18
       },
       {
-        "node_id": "na20d5a1c1b97",
+        "node_id": "n79945e956cbd",
         "collect_path": "rmv",
-        "raw_rows": 62,
-        "distinct_events": 48
+        "raw_rows": 64,
+        "distinct_events": 36
+      },
+      {
+        "node_id": "na976f56792d5",
+        "collect_path": "backfill",
+        "raw_rows": 28,
+        "distinct_events": 28
+      },
+      {
+        "node_id": "na976f56792d5",
+        "collect_path": "rmv",
+        "raw_rows": 64,
+        "distinct_events": 46
       }
     ],
-    "c706e6b6cc403": [
+    "ceb26d8253e22": [
       {
-        "node_id": "nbc24d126b852",
+        "node_id": "n2d1a6b3ba106",
+        "collect_path": "backfill",
+        "raw_rows": 24,
+        "distinct_events": 24
+      },
+      {
+        "node_id": "n2d1a6b3ba106",
         "collect_path": "rmv",
-        "raw_rows": 70,
-        "distinct_events": 46
+        "raw_rows": 56,
+        "distinct_events": 44
       }
     ]
   }

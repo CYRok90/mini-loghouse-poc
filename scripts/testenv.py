@@ -120,7 +120,7 @@ def remote_servers_xml(own_cluster: str) -> str:
         shards = "".join(
             f"<shard><replica><host>{HOST}</host><port>{n.native_port}</port>"
             f"<secure>{1 if n.tls else 0}</secure><user>admin</user>"
-            f"<password from_env=\"MLH_TEST_ADMIN_PASSWORD\"/></replica></shard>"
+            f"<password from_env=\"MLH_TEST_ADMIN_PASSWORD\" hide_in_preprocessed=\"true\"/></replica></shard>"
             for n in nodes
         )
         parts.append(f"<{cluster}>{shards}</{cluster}>")
@@ -178,13 +178,13 @@ def users_xml() -> str:
     <quotas><default/></quotas>
     <users>
         <admin>
-            <password from_env="MLH_TEST_ADMIN_PASSWORD"/>
+            <password from_env="MLH_TEST_ADMIN_PASSWORD" hide_in_preprocessed="true"/>
             <networks><ip>127.0.0.1</ip></networks>
             <profile>default</profile><quota>default</quota>
             <access_management>1</access_management>
         </admin>
         <mlh_collector>
-            <password from_env="MLH_TEST_COLLECTOR_PASSWORD"/>
+            <password from_env="MLH_TEST_COLLECTOR_PASSWORD" hide_in_preprocessed="true"/>
             <networks><ip>127.0.0.1</ip></networks>
             <profile>default</profile><quota>default</quota>
             <grants>
@@ -195,7 +195,7 @@ def users_xml() -> str:
             </grants>
         </mlh_collector>
         <mlh_noperm>
-            <password from_env="MLH_TEST_NOPERM_PASSWORD"/>
+            <password from_env="MLH_TEST_NOPERM_PASSWORD" hide_in_preprocessed="true"/>
             <networks><ip>127.0.0.1</ip></networks>
             <profile>default</profile><quota>default</quota>
             <grants><query>GRANT SELECT ON system.one</query></grants>
@@ -227,16 +227,28 @@ def node_env() -> dict[str, str]:
     }
 
 
+def _lstart(pid: int) -> str:
+    return subprocess.run(["ps", "-o", "lstart=", "-p", str(pid)], capture_output=True, text=True).stdout.strip()
+
+
 def pid_of(node: Node) -> int | None:
+    """PID from the pid file only if it is still the SAME process we started (Codex P2-11).
+
+    ClickHouse renames its watchdog process, so the command line cannot be used; the
+    pid file stores the process start time and both must match (guards against PID reuse).
+    """
     pid_file = node.dir / "server.pid"
     if not pid_file.exists():
         return None
-    pid = int(pid_file.read_text().strip() or 0)
+    parts = pid_file.read_text().split("\n", 1)
+    pid = int(parts[0].strip() or 0)
+    if pid <= 0 or len(parts) < 2 or not parts[1].strip():
+        return None
     try:
         os.kill(pid, 0)
     except (ProcessLookupError, PermissionError):
         return None
-    return pid
+    return pid if _lstart(pid) == parts[1].strip() else None
 
 
 def port_open(port: int) -> bool:
@@ -256,7 +268,7 @@ def start(names: list[str]) -> None:
             [str(BINARY), "server", f"--config-file={node.dir / 'config.xml'}"],
             cwd=node.dir, env=env, stdout=out, stderr=out, start_new_session=True,
         )
-        (node.dir / "server.pid").write_text(str(proc.pid))
+        (node.dir / "server.pid").write_text(f"{proc.pid}\n{_lstart(proc.pid)}")
     for node in (NODES[n] for n in names):
         deadline = time.monotonic() + 60
         while time.monotonic() < deadline and not port_open(node.http_port):
@@ -276,6 +288,7 @@ def stop(names: list[str]) -> None:
             time.sleep(0.5)
         if pid_of(node):
             os.kill(pid, signal.SIGKILL)
+        (node.dir / "server.pid").unlink(missing_ok=True)
         print(f"{node.name}: stopped")
 
 

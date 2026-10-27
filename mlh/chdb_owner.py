@@ -35,7 +35,9 @@ class AlreadyRunning(RuntimeError):
 
 
 def acquire_lock(path: Path) -> int:
+    """Exclusive, non-blocking; must be taken before the registry, key or chDB are touched."""
     path.parent.mkdir(parents=True, exist_ok=True)
+    os.chmod(path.parent, 0o700)
     fd = os.open(path, os.O_RDWR | os.O_CREAT, 0o600)
     try:
         fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -79,10 +81,8 @@ def write_private(path: Path, content: str) -> None:
 
 class ChdbOwner:
     def __init__(self, settings: Settings, key: KeyMaterial) -> None:
+        """The caller must already hold the data-dir lock (see api.start_runtime)."""
         self._settings = settings
-        settings.data_dir.mkdir(parents=True, exist_ok=True)
-        os.chmod(settings.data_dir, 0o700)
-        self._lock_fd = acquire_lock(settings.lock_path)
         write_private(settings.chdb_config_path, render_config(settings))
         os.environ[KEY_ENV] = key.key_hex
         self._executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="chdb")
@@ -111,4 +111,3 @@ class ChdbOwner:
         finally:
             self._executor.shutdown(wait=True)
             os.environ.pop(KEY_ENV, None)
-            os.close(self._lock_fd)

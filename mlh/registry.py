@@ -66,6 +66,12 @@ class Registry:
             self._conn.execute("PRAGMA journal_mode=WAL")
             self._conn.execute("PRAGMA foreign_keys=ON")
             self._conn.executescript(SCHEMA)
+            self._migrate()
+
+    def _migrate(self) -> None:
+        columns = {r[1] for r in self._conn.execute("PRAGMA table_info(nodes)").fetchall()}
+        if "rmv_spec" not in columns:  # JSON of schema.rmv_spec() used when the node's RMVs were created
+            self._conn.execute("ALTER TABLE nodes ADD COLUMN rmv_spec TEXT")
 
     @contextmanager
     def tx(self) -> Iterator[sqlite3.Connection]:
@@ -116,15 +122,19 @@ class Registry:
                 )
 
     def clusters(self) -> list[dict[str, Any]]:
-        return self.rows("SELECT * FROM clusters WHERE phase != 'deleted' ORDER BY created_at")
+        return self.rows("SELECT * FROM clusters WHERE phase NOT IN ('deleted', 'deleting') ORDER BY created_at")
+
+    def all_clusters(self) -> list[dict[str, Any]]:
+        """Including clusters whose deletion was interrupted (reconcile finishes them)."""
+        return self.rows("SELECT * FROM clusters ORDER BY created_at")
 
     def cluster(self, cluster_id: str) -> dict[str, Any] | None:
-        return self.one("SELECT * FROM clusters WHERE id = ? AND phase != 'deleted'", (cluster_id,))
+        return self.one("SELECT * FROM clusters WHERE id = ? AND phase NOT IN ('deleted', 'deleting')", (cluster_id,))
 
     def nodes(self, cluster_id: str | None = None) -> list[dict[str, Any]]:
         if cluster_id is None:
             return self.rows("SELECT n.* FROM nodes n JOIN clusters c ON c.id = n.cluster_id"
-                             " WHERE c.phase != 'deleted' ORDER BY n.created_at")
+                             " WHERE c.phase NOT IN ('deleted', 'deleting') ORDER BY n.created_at")
         return self.rows("SELECT * FROM nodes WHERE cluster_id = ? ORDER BY created_at, host, port", (cluster_id,))
 
     def set_cluster_phase(self, cluster_id: str, phase: str) -> None:
@@ -135,6 +145,10 @@ class Registry:
         with self.tx() as c:
             c.execute("UPDATE nodes SET phase = ?, last_error_category = ?, last_error_message = ? WHERE id = ?",
                       (phase, category, message, node_id))
+
+    def set_node_spec(self, node_id: str, spec_json: str | None) -> None:
+        with self.tx() as c:
+            c.execute("UPDATE nodes SET rmv_spec = ? WHERE id = ?", (spec_json, node_id))
 
     def record_check(self, cluster_id: str, ok: bool, category: str | None) -> None:
         with self.tx() as c:

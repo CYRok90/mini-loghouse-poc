@@ -11,6 +11,7 @@ Its lifetime is the backend process, independent of any browser or HTTP request.
 
 from __future__ import annotations
 
+import json
 import logging
 import threading
 import time
@@ -77,10 +78,12 @@ class Supervisor:
         success = (refresh or {}).get("last_success_ts")
         previous_success = (persisted or {}).get("last_success_at") or 0
         if source == "query_log" and success and success > previous_success:
-            self._advance(node["id"], int(success), now)
+            self._advance(node, int(success), now)
 
-    def _advance(self, node_id: str, success_ts: int, now: float) -> None:
-        new_cursor, gaps = advance_cursor(self._registry.cursor(node_id), success_ts, now, self._settings)
+    def _advance(self, node: dict, success_ts: int, now: float) -> None:
+        node_id = node["id"]
+        spec = json.loads(node["rmv_spec"]) if node.get("rmv_spec") else None
+        new_cursor, gaps = advance_cursor(self._registry.cursor(node_id), success_ts, now, self._settings, spec)
         for gap in gaps:
             self._registry.add_gap(node_id, gap.lo, gap.hi, gap.state, gap.reason)
             log.info("node %s gap %s [%s, %s) %s", node_id, gap.state, gap.lo, gap.hi, gap.reason)
@@ -94,7 +97,9 @@ class Supervisor:
             backoff = min(300, 5 * 2 ** int(gap["attempts"]))
             if status.get("state") != "collecting" or (gap["attempts"] and now - gap["updated_at"] < backoff):
                 continue
-            self._run_chunk(gap, nodes[gap["node_id"]])
+            with provisioner.LIFECYCLE:  # never backfill a node that is being deleted
+                if self._registry.cluster(nodes[gap["node_id"]]["cluster_id"]) is not None:
+                    self._run_chunk(gap, nodes[gap["node_id"]])
             return  # one chunk per tick keeps the shared chDB executor responsive
 
     def _run_chunk(self, gap: dict[str, Any], node: dict) -> None:

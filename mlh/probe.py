@@ -42,6 +42,24 @@ def render_probe_config(settings: Settings) -> str:
     )
 
 
+def _timeout_result(c: dict) -> dict[str, Any]:
+    return {"host": c["host"], "port": int(c["port"]), "cluster": c.get("cluster"),
+            "connect": {"ok": False, "category": "timeout", "connected": False, "codes": [],
+                        "message": "제한 시간 안에 이 노드 검사가 끝나지 않았습니다 (미확인)."}}
+
+
+def _assemble(lines: list[dict], timed_out: bool) -> dict[str, Any]:
+    """Keep every result the child managed to emit; unfinished candidates become 'timeout'."""
+    endpoint = next((x["result"] for x in lines if x["kind"] == "endpoint"), None)
+    if endpoint is None:
+        message = "연결 검사가 제한 시간 안에 끝나지 않았습니다." if timed_out else "연결 검사 프로세스가 비정상 종료했습니다."
+        return {"fatal": {"category": "timeout" if timed_out else "unclassified", "message": message, "codes": []}}
+    planned = next((x for x in lines if x["kind"] == "plan"), {"candidates": [], "source": "system.clusters"})
+    done = {(c["host"], c["port"]): c for c in (x["result"] for x in lines if x["kind"] == "candidate")}
+    candidates = [done.get((c["host"], int(c["port"])), _timeout_result(c)) for c in planned["candidates"]]
+    return {"endpoint": endpoint, "candidates": candidates, "candidates_source": planned["source"], "partial": timed_out}
+
+
 def run_probe(settings: Settings, endpoint: dict[str, Any], candidates: list[dict] | None) -> dict[str, Any]:
     payload = {
         **endpoint,
@@ -50,17 +68,18 @@ def run_probe(settings: Settings, endpoint: dict[str, Any], candidates: list[dic
         "config": str(settings.data_dir / "probe-config.xml"),
     }
     env = {k: v for k, v in os.environ.items() if not k.startswith("MLH_NC_KEY")}
-    timeout = settings.probe_timeout_seconds + 3 * len(candidates or [])
+    budget = settings.probe_timeout_seconds + 8 * (len(candidates) if candidates is not None else 4)
+    proc = subprocess.Popen([sys.executable, "-m", "mlh.probe"], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                            stderr=subprocess.DEVNULL, text=True, cwd=PROJECT_ROOT, env=env)
+    timed_out = False
     try:
-        done = subprocess.run(
-            [sys.executable, "-m", "mlh.probe"], input=json.dumps(payload), capture_output=True,
-            text=True, timeout=timeout, cwd=PROJECT_ROOT, env=env, check=False,
-        )
+        out, _ = proc.communicate(json.dumps(payload), timeout=budget)
     except subprocess.TimeoutExpired:
-        return {"fatal": {"category": "timeout", "message": "연결 검사가 제한 시간 안에 끝나지 않았습니다.", "codes": []}}
-    if done.returncode != 0 or not done.stdout.strip():
-        return {"fatal": {"category": "unclassified", "message": "연결 검사 프로세스가 비정상 종료했습니다.", "codes": []}}
-    return json.loads(done.stdout)
+        timed_out = True
+        proc.kill()
+        out, _ = proc.communicate()
+    lines = [json.loads(line) for line in (out or "").splitlines() if line.strip().startswith("{")]
+    return _assemble(lines, timed_out)
 
 
 def required_ok(target: dict[str, Any]) -> bool:
@@ -138,22 +157,25 @@ def _derive_candidates(endpoint_result: dict) -> list[dict]:
     return found[:MAX_CANDIDATES]
 
 
-def _child(payload: dict) -> dict[str, Any]:
+def _emit(kind: str, **data: Any) -> None:
+    sys.stdout.write(json.dumps({"kind": kind, **data}) + "\n")
+    sys.stdout.flush()  # the parent keeps everything emitted before a timeout kill
+
+
+def _child(payload: dict) -> None:
     from chdb import session as chs
 
-    config = payload["config"]
-    sess = chs.Session(f"file::memory:?config-file={config}")
+    sess = chs.Session(f"file::memory:?config-file={payload['config']}")
     endpoint = _probe_target(sess, payload, payload["tag"])
+    _emit("endpoint", result=endpoint)
     explicit = payload.get("candidates")
-    candidates = explicit if explicit is not None else _derive_candidates(endpoint)
-    probed = [
-        {**_probe_target(sess, {**payload, "host": c["host"], "port": c["port"]}, payload["tag"]), "cluster": c.get("cluster")}
-        for c in candidates[:MAX_CANDIDATES]
-    ]
+    candidates = (explicit if explicit is not None else _derive_candidates(endpoint))[:MAX_CANDIDATES]
+    _emit("plan", candidates=candidates, source="explicit" if explicit is not None else "system.clusters")
+    for c in candidates:
+        result = _probe_target(sess, {**payload, "host": c["host"], "port": c["port"]}, payload["tag"])
+        _emit("candidate", result={**result, "cluster": c.get("cluster")})
     sess.close()
-    return {"endpoint": endpoint, "candidates": probed, "candidates_source": "explicit" if explicit is not None else "system.clusters"}
 
 
 if __name__ == "__main__":
-    data = json.loads(sys.stdin.read())
-    sys.stdout.write(json.dumps(_child(data)))
+    _child(json.loads(sys.stdin.read()))
