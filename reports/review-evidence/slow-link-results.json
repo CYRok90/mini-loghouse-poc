@@ -1,0 +1,76 @@
+{
+  "before": {
+    "path": "/api/clusters/c455283a23c68/dashboard?range=15m",
+    "status": 200,
+    "seconds": 0.067
+  },
+  "during": [
+    {
+      "path": "/api/clusters/c455283a23c68/dashboard?range=15m",
+      "status": 200,
+      "seconds": 8.226
+    },
+    {
+      "path": "/api/health",
+      "status": 200,
+      "seconds": 0.007
+    },
+    {
+      "path": "/api/clusters",
+      "status": 200,
+      "seconds": 0.006
+    }
+  ],
+  "states_before_resume": [
+    {
+      "node": "r1",
+      "status": {
+        "node_id": "n703b1d899303",
+        "source": "query_log",
+        "state": "collecting",
+        "last_attempt_at": 1793140090.0,
+        "last_success_at": 1793140090.0,
+        "last_error_category": null,
+        "last_error_message": null,
+        "last_error_codes": null,
+        "consecutive_failures": 0,
+        "updated_at": 1793140091.466304
+      }
+    },
+    {
+      "node": "r2",
+      "status": {
+        "node_id": "n472409161b7d",
+        "source": "query_log",
+        "state": "error",
+        "last_attempt_at": 1793140090.0,
+        "last_success_at": 1793140050.0,
+        "last_error_category": "refused",
+        "last_error_message": "연결이 거부되었습니다 (포트가 닫혀 있거나 서버 중지).",
+        "last_error_codes": "519,279,210",
+        "consecutive_failures": 8,
+        "updated_at": 1793140091.466673
+      }
+    },
+    {
+      "node": "r3",
+      "status": {
+        "node_id": "n9e55af77be8d",
+        "source": "query_log",
+        "state": "collecting",
+        "last_attempt_at": 1793140090.0,
+        "last_success_at": 1793140090.0,
+        "last_error_category": null,
+        "last_error_message": null,
+        "last_error_codes": null,
+        "consecutive_failures": 0,
+        "updated_at": 1793140091.46683
+      }
+    }
+  ],
+  "after": {
+    "path": "/api/clusters/c455283a23c68/dashboard?range=15m",
+    "status": 200,
+    "seconds": 0.032
+  }
+}

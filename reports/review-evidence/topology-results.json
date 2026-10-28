@@ -1,0 +1,36 @@
+{
+  "cluster_id": "c4cc9417d3b33",
+  "source_discovery": [
+    {
+      "cluster": "review_a",
+      "host_name": "127.0.0.1",
+      "port": 19511,
+      "is_local": 1
+    },
+    {
+      "cluster": "review_a",
+      "host_name": "127.0.0.1",
+      "port": 19512,
+      "is_local": 0
+    }
+  ],
+  "actually_registered": [
+    {
+      "display_name": "r1",
+      "port": 19111
+    },
+    {
+      "display_name": "r3",
+      "port": 19113
+    }
+  ],
+  "coverage": {
+    "label": "전체 검증됨",
+    "confirmed_nodes": 2,
+    "registered_nodes": 2,
+    "candidate_nodes": 2,
+    "discovered_cluster": "review_a"
+  },
+  "state": "collecting",
+  "expected": "review_a requires r1+r2, but app collected r1+r3; must not say all verified"
+}

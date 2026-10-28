@@ -1,0 +1,92 @@
+{
+  "Review-A TLS": {
+    "cluster_id": "c455283a23c68",
+    "source_rows": 16,
+    "destination_final_rows": 16,
+    "set_and_cardinality_match": true,
+    "raw_rows": 16,
+    "initial_queries": 8,
+    "state": "collecting",
+    "coverage": {
+      "label": "전체 검증됨",
+      "confirmed_nodes": 2,
+      "registered_nodes": 2,
+      "candidate_nodes": 2,
+      "discovered_cluster": "review_a"
+    },
+    "range_state": "full",
+    "gaps": [
+      {
+        "id": 1,
+        "node_id": "n703b1d899303",
+        "lo": 1793138983,
+        "hi": 1793139883,
+        "next_lo": 1793139883,
+        "state": "backfilled",
+        "reason": "initial",
+        "attempts": 0,
+        "created_at": 1793139910.50443,
+        "updated_at": 1793139914.5495958
+      },
+      {
+        "id": 2,
+        "node_id": "n472409161b7d",
+        "lo": 1793138983,
+        "hi": 1793139883,
+        "next_lo": 1793139883,
+        "state": "backfilled",
+        "reason": "initial",
+        "attempts": 0,
+        "created_at": 1793139910.504846,
+        "updated_at": 1793139920.658975
+      }
+    ],
+    "dashboard_summary": {
+      "initial_queries": 20,
+      "initial_failed": 2,
+      "node_events": 20,
+      "query_start_rows": 20,
+      "p95_ms": 16,
+      "p95_samples": 18
+    }
+  },
+  "Review-B slow-link fixture": {
+    "cluster_id": "cd815403aa994",
+    "source_rows": 8,
+    "destination_final_rows": 8,
+    "set_and_cardinality_match": true,
+    "raw_rows": 8,
+    "initial_queries": 4,
+    "state": "collecting",
+    "coverage": {
+      "label": "전체 검증됨",
+      "confirmed_nodes": 1,
+      "registered_nodes": 1,
+      "candidate_nodes": 1,
+      "discovered_cluster": "review_b"
+    },
+    "range_state": "full",
+    "gaps": [
+      {
+        "id": 3,
+        "node_id": "n9e55af77be8d",
+        "lo": 1793139045,
+        "hi": 1793139945,
+        "next_lo": 1793139945,
+        "state": "backfilled",
+        "reason": "initial",
+        "attempts": 0,
+        "created_at": 1793139972.89573,
+        "updated_at": 1793139976.9430451
+      }
+    ],
+    "dashboard_summary": {
+      "initial_queries": 10,
+      "initial_failed": 1,
+      "node_events": 10,
+      "query_start_rows": 10,
+      "p95_ms": 7,
+      "p95_samples": 9
+    }
+  }
+}

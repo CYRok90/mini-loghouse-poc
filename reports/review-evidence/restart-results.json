@@ -1,0 +1,128 @@
+{
+  "old_pid": 66717,
+  "new_pid": 74269,
+  "down_seconds": 36.01,
+  "clusters_preserved": true,
+  "clusters": {
+    "Review-A TLS": {
+      "source_rows": 20,
+      "final_rows": 20,
+      "raw_rows": 20,
+      "initial_queries": 9,
+      "match": true,
+      "collect_paths": [
+        "backfill"
+      ],
+      "gaps": [
+        {
+          "id": 1,
+          "node_id": "n703b1d899303",
+          "lo": 1793138983,
+          "hi": 1793139883,
+          "next_lo": 1793139883,
+          "state": "backfilled",
+          "reason": "initial",
+          "attempts": 0,
+          "created_at": 1793139910.50443,
+          "updated_at": 1793139914.5495958
+        },
+        {
+          "id": 2,
+          "node_id": "n472409161b7d",
+          "lo": 1793138983,
+          "hi": 1793139883,
+          "next_lo": 1793139883,
+          "state": "backfilled",
+          "reason": "initial",
+          "attempts": 0,
+          "created_at": 1793139910.504846,
+          "updated_at": 1793139920.658975
+        },
+        {
+          "id": 5,
+          "node_id": "n472409161b7d",
+          "lo": 1793140027,
+          "hi": 1793140203,
+          "next_lo": 1793140203,
+          "state": "backfilled",
+          "reason": "collection_interrupted",
+          "attempts": 0,
+          "created_at": 1793140230.200108,
+          "updated_at": 1793140230.21281
+        },
+        {
+          "id": 7,
+          "node_id": "n703b1d899303",
+          "lo": 1793140317,
+          "hi": 1793140353,
+          "next_lo": 1793140353,
+          "state": "backfilled",
+          "reason": "collection_interrupted",
+          "attempts": 0,
+          "created_at": 1793140381.406821,
+          "updated_at": 1793140381.441372
+        },
+        {
+          "id": 8,
+          "node_id": "n472409161b7d",
+          "lo": 1793140317,
+          "hi": 1793140353,
+          "next_lo": 1793140353,
+          "state": "backfilled",
+          "reason": "collection_interrupted",
+          "attempts": 0,
+          "created_at": 1793140381.407815,
+          "updated_at": 1793140383.484174
+        }
+      ]
+    },
+    "Review-B slow-link fixture": {
+      "source_rows": 6,
+      "final_rows": 6,
+      "raw_rows": 6,
+      "initial_queries": 3,
+      "match": true,
+      "collect_paths": [
+        "backfill"
+      ],
+      "gaps": [
+        {
+          "id": 3,
+          "node_id": "n9e55af77be8d",
+          "lo": 1793139045,
+          "hi": 1793139945,
+          "next_lo": 1793139945,
+          "state": "backfilled",
+          "reason": "initial",
+          "attempts": 0,
+          "created_at": 1793139972.89573,
+          "updated_at": 1793139976.9430451
+        },
+        {
+          "id": 4,
+          "node_id": "n9e55af77be8d",
+          "lo": 1793139692,
+          "hi": 1793139722,
+          "next_lo": 1793139722,
+          "state": "backfilled",
+          "reason": "review_slow_link_injection",
+          "attempts": 0,
+          "created_at": 1793140092.9899368,
+          "updated_at": 1793140113.5316951
+        },
+        {
+          "id": 6,
+          "node_id": "n9e55af77be8d",
+          "lo": 1793140317,
+          "hi": 1793140352,
+          "next_lo": 1793140352,
+          "state": "backfilled",
+          "reason": "collection_interrupted",
+          "attempts": 0,
+          "created_at": 1793140379.3633542,
+          "updated_at": 1793140379.392437
+        }
+      ]
+    }
+  }
+}

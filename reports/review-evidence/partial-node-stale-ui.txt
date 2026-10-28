@@ -1,0 +1,50 @@
+노드 (source displayName)	system.metrics	system.query_log	범위
+r1
+127.0.0.1:19511
+
+●
+수집 중
+성공 07:29:40 (4초 전)
+
+●
+수집 중
+성공 07:29:40 (4초 전)
+	수집 확인
+r2
+127.0.0.1:19512
+
+✕
+수집 오류
+성공 07:27:30 (2분 14초 전)
+연결이 거부되었습니다 (포트가 닫혀 있거나 서버 중지). · 연속 24회
+
+✕
+수집 오류
+성공 07:27:30 (2분 14초 전)
+연결이 거부되었습니다 (포트가 닫혀 있거나 서버 중지). · 연속 24회
+	수집 확인
+
+Query
+2
+2개 노드 · 07:29:40
+TCPConnection
+2
+2개 노드 · 07:29:40
+HTTPConnection
+0
+2개 노드 · 07:29:40
+MemoryTracking
+712.0 MiB
+2개 노드 · 07:29:40
+Merge
+0
+2개 노드 · 07:29:40
+BackgroundMergesAndMutationsPoolTask
+0
+2개 노드 · 07:29:40
+PartsActive
+4
+2개 노드 · 07:29:40
+GlobalThreadActive
+315
+2개 노드 · 07:29:40

@@ -1,0 +1,13 @@
+연결 테스트 결과
+
+접속·인증 성공 — ClickHouse 26.8.34.13, 서버 표시 이름 r3, 서버 시간대 Asia/Seoul
+
+system.metrics (필수): 조회 가능 (553행)
+system.query_log (필수): 조회 가능 (최근 1시간 576행)
+system.clusters (노드 범위 확인, 선택): 조회 가능 (1행)
+확인된 노드 범위
+
+system.clusters에서 endpoint가 속한 클러스터 'review_b'의 노드 1개를 발견했습니다. 같은 계정으로 각 노드를 직접 검사했습니다.
+
+수집	주소	출처	결과
+	127.0.0.1:19999	등록 endpoint	필수 검사 통과

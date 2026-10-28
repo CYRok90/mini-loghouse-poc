@@ -1,0 +1,26 @@
+{
+  "expected": "auth: the username does not exist",
+  "http_status": 200,
+  "result": {
+    "ok": false,
+    "endpoint": {
+      "host": "127.0.0.1",
+      "port": 19111,
+      "connect": {
+        "ok": false,
+        "category": "dns",
+        "message": "호스트 이름을 해석할 수 없습니다 (DNS).",
+        "codes": [
+          516,
+          198
+        ],
+        "connected": false
+      },
+      "duration_ms": 829
+    },
+    "candidates": [],
+    "candidates_source": "explicit",
+    "discovered_cluster": null,
+    "candidate_count": 0
+  }
+}

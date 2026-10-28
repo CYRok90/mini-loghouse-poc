@@ -1,0 +1,30 @@
+{
+  "missing": {
+    "health_mode": "recovery",
+    "reason": "암호화 키 문제: key file is missing",
+    "cluster_states": [
+      "error"
+    ],
+    "last_check_states": [
+      "unknown"
+    ]
+  },
+  "wrong": {
+    "health_mode": "recovery",
+    "reason": "암호화 키 문제: key fingerprint does not match the one recorded for this data directory",
+    "cluster_states": [
+      "error"
+    ],
+    "last_check_states": [
+      "unknown"
+    ]
+  },
+  "restored": {
+    "health_mode": "normal",
+    "pid": 76688
+  },
+  "second_owner": {
+    "exit_code": 3,
+    "already_running_detected": true
+  }
+}

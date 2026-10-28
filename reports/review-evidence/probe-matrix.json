@@ -1,0 +1,217 @@
+{
+  "wrong_password": {
+    "http_status": 200,
+    "seconds": 0.356,
+    "result": {
+      "ok": false,
+      "endpoint": {
+        "host": "127.0.0.1",
+        "port": 19511,
+        "connect": {
+          "ok": false,
+          "category": "auth",
+          "message": "인증에 실패했습니다 (사용자 이름 또는 비밀번호).",
+          "codes": [
+            516
+          ],
+          "connected": false
+        },
+        "duration_ms": 82
+      },
+      "candidates": [],
+      "candidates_source": "explicit",
+      "discovered_cluster": null,
+      "candidate_count": 0
+    }
+  },
+  "no_permission": {
+    "http_status": 200,
+    "seconds": 0.308,
+    "result": {
+      "ok": false,
+      "endpoint": {
+        "host": "127.0.0.1",
+        "port": 19511,
+        "connect": {
+          "ok": true,
+          "version": "26.8.34.13",
+          "display_name": "r1",
+          "server_uuid": "b6c91401-8868-4ebb-ba78-afb855d04485",
+          "timezone": "Asia/Seoul"
+        },
+        "checks": {
+          "metrics": {
+            "ok": false,
+            "category": "access_denied",
+            "message": "system table 조회 권한이 없습니다 (ACCESS_DENIED).",
+            "codes": [
+              497
+            ],
+            "connected": true
+          },
+          "query_log": {
+            "ok": false,
+            "category": "access_denied",
+            "message": "system table 조회 권한이 없습니다 (ACCESS_DENIED).",
+            "codes": [
+              497
+            ],
+            "connected": true
+          },
+          "clusters": {
+            "ok": false,
+            "category": "access_denied",
+            "message": "system table 조회 권한이 없습니다 (ACCESS_DENIED).",
+            "codes": [
+              497
+            ],
+            "connected": true
+          }
+        },
+        "duration_ms": 94
+      },
+      "candidates": [],
+      "candidates_source": "explicit",
+      "discovered_cluster": null,
+      "candidate_count": 0
+    }
+  },
+  "closed_port": {
+    "http_status": 200,
+    "seconds": 0.283,
+    "result": {
+      "ok": false,
+      "endpoint": {
+        "host": "127.0.0.1",
+        "port": 19999,
+        "connect": {
+          "ok": false,
+          "category": "refused",
+          "message": "연결이 거부되었습니다 (포트가 닫혀 있거나 서버 중지).",
+          "codes": [
+            519,
+            279,
+            210
+          ],
+          "connected": false
+        },
+        "duration_ms": 75
+      },
+      "candidates": [],
+      "candidates_source": "explicit",
+      "discovered_cluster": null,
+      "candidate_count": 0
+    }
+  },
+  "tls_to_plain": {
+    "http_status": 200,
+    "seconds": 0.287,
+    "result": {
+      "ok": false,
+      "endpoint": {
+        "host": "127.0.0.1",
+        "port": 19113,
+        "connect": {
+          "ok": false,
+          "category": "tls_not_tls_endpoint",
+          "message": "TLS로 접속했지만 서버가 TLS 응답을 하지 않았습니다. 평문 native 포트이거나 TLS 설정이 다릅니다.",
+          "codes": [
+            519,
+            279,
+            210
+          ],
+          "connected": false
+        },
+        "duration_ms": 79
+      },
+      "candidates": [],
+      "candidates_source": "explicit",
+      "discovered_cluster": null,
+      "candidate_count": 0
+    }
+  },
+  "plain_to_tls": {
+    "http_status": 200,
+    "seconds": 0.286,
+    "result": {
+      "ok": false,
+      "endpoint": {
+        "host": "127.0.0.1",
+        "port": 19511,
+        "connect": {
+          "ok": false,
+          "category": "tls_endpoint_plain_client",
+          "message": "서버가 TLS로 응답했습니다. TLS 사용을 켜고 다시 시도하세요.",
+          "codes": [
+            519,
+            279,
+            102
+          ],
+          "connected": false
+        },
+        "duration_ms": 81
+      },
+      "candidates": [],
+      "candidates_source": "explicit",
+      "discovered_cluster": null,
+      "candidate_count": 0
+    }
+  },
+  "http_as_native": {
+    "http_status": 200,
+    "seconds": 0.283,
+    "result": {
+      "ok": false,
+      "endpoint": {
+        "host": "127.0.0.1",
+        "port": 18113,
+        "connect": {
+          "ok": false,
+          "category": "http_endpoint",
+          "message": "native protocol이 아닌 HTTP 응답을 받았습니다. HTTP 포트가 아니라 native(TCP) 포트가 필요합니다.",
+          "codes": [
+            519,
+            279,
+            102
+          ],
+          "connected": false
+        },
+        "duration_ms": 77
+      },
+      "candidates": [],
+      "candidates_source": "explicit",
+      "discovered_cluster": null,
+      "candidate_count": 0
+    }
+  },
+  "bad_origin": {
+    "status": 403
+  },
+  "bad_host": {
+    "status": 421
+  },
+  "duplicate": {
+    "status": 409
+  },
+  "untrusted_ca": {
+    "endpoint": {
+      "host": "127.0.0.1",
+      "port": 19511,
+      "connect": {
+        "ok": false,
+        "category": "tls_verify",
+        "message": "TLS 인증서를 검증하지 못했습니다 (CA 신뢰 설정 확인).",
+        "codes": [
+          519,
+          279,
+          210
+        ],
+        "connected": false
+      },
+      "duration_ms": 81
+    },
+    "candidates": [],
+    "candidates_source": "explicit",
+    "partial": false
+  }
+}

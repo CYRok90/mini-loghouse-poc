@@ -1,0 +1,121 @@
+{
+  "observed_duplicate_raw_and_exact_final": true,
+  "expected_events": 16,
+  "expected_initial": 8,
+  "observations": [
+    {
+      "at": 1793140871.568227,
+      "raw_rows": 0,
+      "final_rows": 0,
+      "initial_queries": 0
+    },
+    {
+      "at": 1793140872.608119,
+      "raw_rows": 0,
+      "final_rows": 0,
+      "initial_queries": 0
+    },
+    {
+      "at": 1793140873.64797,
+      "raw_rows": 0,
+      "final_rows": 0,
+      "initial_queries": 0
+    },
+    {
+      "at": 1793140874.6883972,
+      "raw_rows": 0,
+      "final_rows": 0,
+      "initial_queries": 0
+    },
+    {
+      "at": 1793140875.7293792,
+      "raw_rows": 0,
+      "final_rows": 0,
+      "initial_queries": 0
+    },
+    {
+      "at": 1793140876.769294,
+      "raw_rows": 0,
+      "final_rows": 0,
+      "initial_queries": 0
+    },
+    {
+      "at": 1793140877.8055198,
+      "raw_rows": 0,
+      "final_rows": 0,
+      "initial_queries": 0
+    },
+    {
+      "at": 1793140878.8470871,
+      "raw_rows": 0,
+      "final_rows": 0,
+      "initial_queries": 0
+    },
+    {
+      "at": 1793140879.885483,
+      "raw_rows": 0,
+      "final_rows": 0,
+      "initial_queries": 0
+    },
+    {
+      "at": 1793140880.9364,
+      "raw_rows": 16,
+      "final_rows": 16,
+      "initial_queries": 8
+    },
+    {
+      "at": 1793140881.980799,
+      "raw_rows": 16,
+      "final_rows": 16,
+      "initial_queries": 8
+    },
+    {
+      "at": 1793140883.029454,
+      "raw_rows": 16,
+      "final_rows": 16,
+      "initial_queries": 8
+    },
+    {
+      "at": 1793140884.0694242,
+      "raw_rows": 16,
+      "final_rows": 16,
+      "initial_queries": 8
+    },
+    {
+      "at": 1793140885.0876632,
+      "raw_rows": 16,
+      "final_rows": 16,
+      "initial_queries": 8
+    },
+    {
+      "at": 1793140886.1300962,
+      "raw_rows": 16,
+      "final_rows": 16,
+      "initial_queries": 8
+    },
+    {
+      "at": 1793140887.16898,
+      "raw_rows": 16,
+      "final_rows": 16,
+      "initial_queries": 8
+    },
+    {
+      "at": 1793140888.208181,
+      "raw_rows": 16,
+      "final_rows": 16,
+      "initial_queries": 8
+    },
+    {
+      "at": 1793140889.248009,
+      "raw_rows": 16,
+      "final_rows": 16,
+      "initial_queries": 8
+    },
+    {
+      "at": 1793140890.280433,
+      "raw_rows": 32,
+      "final_rows": 16,
+      "initial_queries": 8
+    }
+  ]
+}

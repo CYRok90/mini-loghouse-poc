@@ -1,6 +1,8 @@
 # chDB Mini LogHouse PoC — 기술타당성 보고서
 
-- 작성: 2026-10-27~28 · 대상 명세: `../mini-loghouse-poc-goal.md`
+> 이 문서는 구현 당시의 검증 기록입니다. 후속 [독립 사용·코드 리뷰](independent-review-2026-10-28.md)에서 장애 격리·coverage·freshness 등 주요 미해결 문제 7건을 재현했습니다. 아래 완료 판정은 이 후속 결과와 함께 읽어야 하며 운영 준비 완료를 뜻하지 않습니다.
+
+- 작성: 2026-10-27~28 · 대상 명세: [`docs/poc-goal.md`](../docs/poc-goal.md)
 - 범위: 로컬(loopback) 단일 운영자 PoC. 외부 공개 가능한 제품이 아님.
 
 ## 1. 결론

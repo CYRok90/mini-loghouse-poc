@@ -1,0 +1,33 @@
+{
+  "measured_ms": 1793140120567,
+  "state": "error",
+  "stale_threshold": 23,
+  "nodes": [
+    {
+      "name": "r1",
+      "state": "collecting",
+      "success_ms": 1793140115000
+    },
+    {
+      "name": "r2",
+      "state": "error",
+      "success_ms": 1793140050000
+    }
+  ],
+  "memory_snapshots": [
+    {
+      "node_id": "n472409161b7d",
+      "display_name": "r2",
+      "metric": "MemoryTracking",
+      "value": 373239945,
+      "at_ms": 1793140050018
+    },
+    {
+      "node_id": "n703b1d899303",
+      "display_name": "r1",
+      "metric": "MemoryTracking",
+      "value": 373180623,
+      "at_ms": 1793140120063
+    }
+  ]
+}
