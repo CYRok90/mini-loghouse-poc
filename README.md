@@ -2,7 +2,7 @@
 
 **별도 수집 서비스 없이, 앱 안의 chDB가 여러 ClickHouse의 system table을 직접 수집하고 보여 줄 수 있을까?**
 
-Mini LogHouse는 이 질문을 검증하는 **로컬 단일 운영자용 관측 앱**입니다. 웹에서 ClickHouse 클러스터를 등록하면, backend에 내장된 chDB의 **Refreshable Materialized View(RMV) + `remote()` / `remoteSecure()`**가 노드별 `system.metrics`와 `system.query_log`를 주기적으로 가져옵니다. Dashboard는 원격 클러스터를 매번 조회하지 않고 **로컬에 쌓인 이력**을 읽습니다.
+Mini LogHouse는 이 질문을 검증하는 **로컬 단일 운영자용 관측 앱**입니다. 웹에서 ClickHouse 클러스터를 등록하면, backend에 내장된 chDB의 **Refreshable Materialized View**(RMV)와 `remote()` / `remoteSecure()`가 노드별 `system.metrics`와 `system.query_log`를 주기적으로 가져옵니다. Dashboard는 원격 클러스터를 매번 조회하지 않고 **로컬에 쌓인 이력**을 읽습니다.
 
 > **상태: 작동하는 실험용 PoC — production-ready 아님.** 실제 2개 클러스터·3개 노드에서 등록 → 수집 → Dashboard와 재시작 복구를 확인했습니다. 별도 리뷰에서는 장애 격리·집계 범위·UI 비동기 처리 등 **주요 미해결 문제 7건**도 재현했습니다. [검증 결과와 알려진 문제](reports/independent-review-2026-10-28.md)를 함께 읽어 주세요. 저장소의 Public 공개는 **소스 공개**이며, 앱을 인터넷에 공개 배포한 것이 아닙니다.
 
@@ -131,7 +131,7 @@ chmod +x .tools/clickhouse
 .venv/bin/python scripts/testenv.py status
 ```
 
-SHA256은 **첫 실행 전 다운로드 파일**의 검증값입니다. 이 fixture는 loopback에만 bind합니다. `init`이 무작위 테스트 계정과 로컬 CA를 만들며, 비밀번호는 **로컬의 `var/testenv/secrets.json`**에 있습니다. Git·이슈·공유 화면에 복사하지 마세요.
+SHA256은 **첫 실행 전 다운로드 파일**의 검증값입니다. 이 fixture는 loopback에만 bind합니다. `init`이 무작위 테스트 계정과 로컬 CA를 만들며, 비밀번호는 로컬 secrets 파일인 `var/testenv/secrets.json`에 있습니다. Git·이슈·공유 화면에 복사하지 마세요.
 
 ### 3. 앱 실행 → 웹에서 등록
 
